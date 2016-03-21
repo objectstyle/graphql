@@ -205,7 +205,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testQueryFiltersAscending() {		
 		insertE1();
 		
-		Response r = post_graphql_request("{ allE1s(_first:\"1\" _orderby:\"id\" _sortorder:\"ascending\") { id name }}");
+		Response r = post_graphql_request("{ allE1s(_first:\"1\" _ascending:\"id\") { id name }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -217,7 +217,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testQueryFiltersDescending() {		
 		insertE1();
 		
-		Response r = post_graphql_request("{ allE1s(_first:\"1\" _orderby:\"id\" _sortorder:\"descending\") { id name }}");
+		Response r = post_graphql_request("{ allE1s(_first:\"1\" _descending:\"id\") { id name }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);

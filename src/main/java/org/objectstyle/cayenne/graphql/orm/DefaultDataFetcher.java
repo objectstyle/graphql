@@ -70,15 +70,11 @@ class DefaultDataFetcher implements DataFetcher {
 		        query.setFetchOffset(0);
 		        query.setFetchLimit(Integer.parseInt(v.toString()));
 				break;
-			case ORDERBY:
+			case ASCENDING:
+			case DESCENDING:
 				System.out.println(v);
-				SortOrder so = SortOrder.ASCENDING;
-				if(filters.get(FilterType.SORTORDER) != null) {
-					// TODO: add check for invalid order
-					so = SortOrder.valueOf(filters.get(FilterType.SORTORDER).toString().toUpperCase());
-				}
-				
-				query.addOrdering(v.toString(), so);
+
+				query.addOrdering(v.toString(), k == FilterType.ASCENDING ? SortOrder.ASCENDING : SortOrder.DESCENDING);
 				
 				break;
 			case UNDEFINED:
