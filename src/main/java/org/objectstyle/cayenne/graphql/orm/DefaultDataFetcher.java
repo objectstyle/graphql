@@ -2,6 +2,7 @@ package org.objectstyle.cayenne.graphql.orm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.ObjectContext;
@@ -65,22 +66,26 @@ class DefaultDataFetcher implements DataFetcher {
         SelectQuery<Object> query = new SelectQuery<>(entity, expression);
         
         filters.forEach((k, v) -> {
-			switch(k){
-			case FIRST:
-		        query.setFetchOffset(0);
-		        query.setFetchLimit(Integer.parseInt(v.toString()));
-				break;
-			case ASCENDING:
-			case DESCENDING:
-				System.out.println(v);
-
-				query.addOrdering(v.toString(), k == FilterType.ASCENDING ? SortOrder.ASCENDING : SortOrder.DESCENDING);
-				
-				break;
-			case UNDEFINED:
-				break;
-			default:
-				break;
+			switch(k) {
+				case FIRST:
+					query.setFetchOffset(0);
+					
+					for(Object o : (List<?>) v) {
+						query.setFetchLimit(Integer.parseInt(o.toString()));
+					}
+	
+					break;
+				case ASCENDING:
+				case DESCENDING:						
+					for(Object o : (List<?>) v) {
+						query.addOrdering(o.toString(), k == FilterType.ASCENDING ? SortOrder.ASCENDING : SortOrder.DESCENDING);					
+					}
+					
+					break;
+				case UNDEFINED:
+					break;
+				default:
+					break;
 			}
 		});
         

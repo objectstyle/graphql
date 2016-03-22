@@ -217,7 +217,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testQueryFiltersDescending() {		
 		insertE1();
 		
-		Response r = post_graphql_request("{ allE1s(_first:\"1\" _descending:\"id\") { id name }}");
+		Response r = post_graphql_request("{ allE1s(_first:\"1\" _descending:[\"id\"]) { id name }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);

@@ -164,10 +164,11 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
 		List<GraphQLArgument> argList = new ArrayList<GraphQLArgument>();
 		
 		new DefaultFilters().getFiltersNames().forEach(f -> {
+			
 			argList.add(GraphQLArgument
 						.newArgument()
 						.name(f)
-						.type(Scalars.GraphQLString)
+						.type(new GraphQLList(Scalars.GraphQLString))
 						.build());
 		});
 
