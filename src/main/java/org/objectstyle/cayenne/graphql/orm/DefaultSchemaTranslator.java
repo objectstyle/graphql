@@ -163,13 +163,14 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
 	protected List<GraphQLArgument> createDefaultFilters(){
 		List<GraphQLArgument> argList = new ArrayList<GraphQLArgument>();
 		
-		new DefaultFilters().getFiltersNames().forEach(f -> {
-			
-			argList.add(GraphQLArgument
-						.newArgument()
-						.name(f)
-						.type(new GraphQLList(Scalars.GraphQLString))
-						.build());
+		new DefaultFilters().getFilters().forEach((k, v) -> {
+			if(k != FilterType.UNDEFINED) {
+				argList.add(GraphQLArgument
+							.newArgument()
+							.name(v)
+							.type(new GraphQLList(Scalars.GraphQLString))
+							.build());
+			}
 		});
 
 		return argList;

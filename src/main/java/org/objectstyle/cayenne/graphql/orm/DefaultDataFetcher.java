@@ -72,6 +72,7 @@ class DefaultDataFetcher implements DataFetcher {
 					
 					for(Object o : (List<?>) v) {
 						query.setFetchLimit(Integer.parseInt(o.toString()));
+						break;
 					}
 	
 					break;
