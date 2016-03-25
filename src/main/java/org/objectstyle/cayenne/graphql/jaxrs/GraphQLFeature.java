@@ -5,7 +5,7 @@ import javax.ws.rs.core.FeatureContext;
 
 import org.objectstyle.cayenne.graphql.jaxrs.provider.BQGraphQLRestExceptionMapper;
 import org.objectstyle.cayenne.graphql.jaxrs.provider.ExecutionResultWriter;
-import org.objectstyle.cayenne.graphql.jaxrs.provider.GraphiQLRestQueryReader;
+import org.objectstyle.cayenne.graphql.jaxrs.provider.GraphQLRestQueryReader;
 import org.objectstyle.cayenne.graphql.jaxrs.provider.MessageResponseWriter;
 
 /**
@@ -17,7 +17,7 @@ public class GraphQLFeature implements Feature {
 	public boolean configure(FeatureContext context) {
 		context.register(MessageResponseWriter.class);
 		context.register(BQGraphQLRestExceptionMapper.class);
-		context.register(GraphiQLRestQueryReader.class);
+		context.register(GraphQLRestQueryReader.class);
 		context.register(ExecutionResultWriter.class);
 		context.register(GraphQLResource.class);
 		return true;

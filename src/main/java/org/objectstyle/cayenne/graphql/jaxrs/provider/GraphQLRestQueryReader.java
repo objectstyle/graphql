@@ -19,7 +19,7 @@ import com.google.inject.Inject;
 
 @Singleton
 @Provider
-public class GraphiQLRestQueryReader implements MessageBodyReader<GraphQLRestQuery> {
+public class GraphQLRestQueryReader implements MessageBodyReader<GraphQLRestQuery> {
 
 	@Inject
 	private JsonReader jsonParser;
