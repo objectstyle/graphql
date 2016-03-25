@@ -17,14 +17,14 @@ import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLSchema.Builder;
 import graphql.schema.GraphQLTypeReference;
 
 public class DefaultSchemaTranslator implements SchemaTranslator {
 
-	private ConcurrentMap<Class<?>, GraphQLOutputType> typeCache;
+	private ConcurrentMap<Class<?>, GraphQLScalarType> typeCache;
 	private ObjectContext selectContext;
 
 	public DefaultSchemaTranslator(ObjectContext selectContext) {
@@ -122,10 +122,9 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
 		
 			// add attributes
 			oe.getAttributes().forEach(oa -> {
-				GraphQLOutputType type = mapAttributeType(oa.getJavaClass());
 				GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
 						.name(oa.getName())
-						.type(type)
+						.type(mapType(oa.getJavaClass()))
 						.build();
 				
 				typeBuilder.field(f);
@@ -139,7 +138,7 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
 					argList.add(GraphQLArgument
 								.newArgument()
 								.name(tea.getName())
-								.type(Scalars.GraphQLString)
+								.type(mapType(tea.getJavaClass()))
 								.build());
 				});
 				
@@ -148,8 +147,8 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
 				GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
 						.name(or.getName())
 						.argument(argList)
-						.type(new GraphQLList(new GraphQLTypeReference(or.getTargetEntityName())))
-						.dataFetcher(new DefaultDataFetcher(or.getTargetEntityName(), selectContext, or))
+						.type(or.isToMany() ? new GraphQLList(new GraphQLTypeReference(or.getTargetEntityName())) : new GraphQLTypeReference(or.getTargetEntityName()))
+						.dataFetcher(new DefaultDataFetcher(or.getTargetEntityName(), selectContext, or.getName()))
 						.build();
 				typeBuilder.field(f);
 			});
@@ -176,7 +175,7 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
 		return argList;
 	}
 					
-	protected GraphQLOutputType mapAttributeType(Class<?> javaType) {
+	protected GraphQLScalarType mapType(Class<?> javaType) {
 
 		return typeCache.computeIfAbsent(javaType, jt -> {
 			// TODO: weak

@@ -4,13 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import org.apache.cayenne.CayenneDataObject;
+import org.apache.cayenne.DataObject;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.cayenne.query.SortOrder;
 
@@ -21,14 +18,14 @@ class DefaultDataFetcher implements DataFetcher {
 
 	private String entity;
 	private ObjectContext context;
-	private ObjRelationship relationship = null;
+	private String relationship = null;
 
 	public DefaultDataFetcher(String entity, ObjectContext context) {
 		this.entity = entity;
 		this.context = context;
 	}
 	
-	public DefaultDataFetcher(String entity, ObjectContext context, ObjRelationship relationship) {
+	public DefaultDataFetcher(String entity, ObjectContext context, String relationship) {
 		this.entity = entity;
 		this.context = context;
 		this.relationship = relationship;
@@ -51,20 +48,18 @@ class DefaultDataFetcher implements DataFetcher {
 		});
 		
 		if(relationship != null) {
-			for(DbRelationship r : relationship.getDbRelationships()){
-				for(DbJoin j : r.getJoins()){
-					CayenneDataObject cdo = (CayenneDataObject)environment.getSource();
-					Object v = cdo.readProperty(j.getSource().getName());
-					if(v != null && !params.containsKey(j.getTarget().getName())) {
-						params.put(j.getTarget().getName(), v.toString());
-					}
-				}	
-			}
+			Object obj = ((DataObject)environment.getSource()).readProperty(relationship);
+					
+			if(params.isEmpty())
+				return obj;
+			
+			Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
+			return expression.filterObjects((List<?>)obj);
 		}
-		
+			
         Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
         SelectQuery<Object> query = new SelectQuery<>(entity, expression);
-        
+			
         filters.forEach((k, v) -> {
 			switch(k) {
 				case FIRST:
@@ -82,8 +77,6 @@ class DefaultDataFetcher implements DataFetcher {
 						query.addOrdering(o.toString(), k == FilterType.ASCENDING ? SortOrder.ASCENDING : SortOrder.DESCENDING);					
 					}
 					
-					break;
-				case UNDEFINED:
 					break;
 				default:
 					break;

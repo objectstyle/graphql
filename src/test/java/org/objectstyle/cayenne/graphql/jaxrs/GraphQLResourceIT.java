@@ -61,7 +61,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testQueryAllE1WithArguments() {		
 		insertE1();
 		
-		Response r = post_graphql_request("{ allE1s(id:\"1\") { id name }}");
+		Response r = post_graphql_request("{ allE1s(id:1) { id name }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -97,7 +97,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testDataQueryByIdForE1() {		
 		insertE1();
 		
-		Response r = post_graphql_request("{ E1 (id:\"2\") { id name}}");
+		Response r = post_graphql_request("{ E1 (id:2) { id name}}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -109,7 +109,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testDataQueryByIdForE2() {		
 		insertE2();
 		
-		Response r = post_graphql_request("{ E2 (id:\"3\") { id name}}");
+		Response r = post_graphql_request("{ E2 (id:3) { id name}}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -121,7 +121,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testDataQueryRelationshipsForE1() {		
 		insertE2();
 		
-		Response r = post_graphql_request("{ E1 (id:\"2\" name:\"b\") { id name e2s {id name} }}");
+		Response r = post_graphql_request("{ E1 (id:2 name:\"b\") { id name e2s {id name} }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -133,7 +133,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testDataQueryRelationshipsForE1_2() {		
 		insertE2();
 		
-		Response r = post_graphql_request("{ E1 (id:\"2\" name:\"b\") { id name e2s (id:\"4\") {id name} }}");
+		Response r = post_graphql_request("{ E1 (id:2 name:\"b\") { id name e2s (id:4) {id name} }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -145,31 +145,31 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testDataQueryRelationshipsForE2() {		
 		insertE2();
 		
-		Response r = post_graphql_request("{ E2 (id:\"3\") { id name e1 {id name} }}");
+		Response r = post_graphql_request("{ E2 (id:3) { id name e1 {id name} }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
 		System.out.println(json);
-		assertTrue(json, json.equals("{\"data\":{\"E2\":[{\"id\":3,\"name\":\"c\",\"e1\":[{\"id\":1,\"name\":\"a\"}]}]}}"));
+		assertTrue(json, json.equals("{\"data\":{\"E2\":[{\"id\":3,\"name\":\"c\",\"e1\":{\"id\":1,\"name\":\"a\"}}]}}"));
 	}
 
 	@Test
 	public void testDataQueryRelationshipsForE3() {		
 		insertE3();
 		
-		Response r = post_graphql_request("{ E3 (id:\"6\") { id name e2 {id name e1 {id name}} }}");
+		Response r = post_graphql_request("{ E3 (id:6) { id name e2 {id name e1 {id name}} }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
 		System.out.println(json);
-		assertTrue(json, json.equals("{\"data\":{\"E3\":[{\"id\":6,\"name\":\"f\",\"e2\":[{\"id\":4,\"name\":\"d\",\"e1\":[{\"id\":2,\"name\":\"b\"}]}]}]}}"));
+		assertTrue(json, json.equals("{\"data\":{\"E3\":[{\"id\":6,\"name\":\"f\",\"e2\":{\"id\":4,\"name\":\"d\",\"e1\":{\"id\":2,\"name\":\"b\"}}}]}}"));
 	}
 	
 	@Test
 	public void testDataQueryRelationshipsForE3_2() {		
 		insertE3();
 		
-		Response r = post_graphql_request("{ E1 (id:\"2\" name:\"b\") { id name e2s {id name e3s {id name}} }}");
+		Response r = post_graphql_request("{ E1 (id:2 name:\"b\") { id name e2s {id name e3s {id name}} }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -181,7 +181,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testDataQueryAlias_1() {		
 		insertE2();
 		
-		Response r = post_graphql_request("{ E1 (id:\"2\" name:\"b\") { id name e4: e2s(id:\"4\") {id name} }}");
+		Response r = post_graphql_request("{ E1 (id:2 name:\"b\") { id name e4: e2s(id:4) {id name} }}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
@@ -193,7 +193,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	public void testDataQueryAlias_2() {		
 		insertE1();
 		
-		Response r = post_graphql_request("{e1: E1(id:\"1\") {id} e2: E1(id:\"2\") {id}}");
+		Response r = post_graphql_request("{e1: E1(id:1) {id} e2: E1(id:2) {id}}");
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
 		String json = r.readEntity(String.class);
