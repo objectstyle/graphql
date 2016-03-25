@@ -3,17 +3,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<groupId>com.objectstyle.cayenne.graphql</groupId>
 	<artifactId>cayenne-graphql</artifactId>
+	<version>0.1-SNAPSHOT</version>
 
 	<name>Cayenne GraphQL</name>
 	<description>A Java server framework that provides a GraphQL support for relational databases over REST. The framework is intended for embedding in user applications. The easiest way to do it is via Bootique engine.
 	</description>
 
 	<properties>
-	    <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jersey-version>2.21</jersey-version>
 	</properties>
 
@@ -190,7 +192,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- Optional profile used to sign artifacts -->
 	<profiles>
 		<profile>
@@ -214,6 +216,4 @@
 			</build>
 		</profile>
 	</profiles>
-	<groupId>cayenne-graphql</groupId>
-	<version>0.1-SNAPSHOT</version>
 </project>
