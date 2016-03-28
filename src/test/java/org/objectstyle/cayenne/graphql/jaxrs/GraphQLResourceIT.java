@@ -214,7 +214,7 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 	}
 
 	@Test
-	public void testQueryFiltersDescending() {		
+	public void testQueryFiltersDescending_1() {		
 		insertE1();
 		
 		Response r = post_graphql_request("{ allE1s(_first:\"1\" _descending:[\"id\"]) { id name }}");
@@ -223,5 +223,17 @@ public class GraphQLResourceIT extends GraphQLJerseyTestOnDerby {
 		String json = r.readEntity(String.class);
 		System.out.println(json);
 		assertTrue(json, json.equals("{\"data\":{\"allE1s\":[{\"id\":2,\"name\":\"b\"}]}}"));
+	}
+	
+	@Test
+	public void testQueryFiltersDescending_2() {		
+		insertE2();
+		
+		Response r = post_graphql_request("{ E1 (id:2 name:\"b\") { id name e2s(_first:\"1\" _descending:[\"id\"]) {id name} }}");
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+
+		String json = r.readEntity(String.class);
+		System.out.println(json);
+		assertTrue(json, json.equals("{\"data\":{\"E1\":[{\"id\":2,\"name\":\"b\",\"e2s\":[{\"id\":5,\"name\":\"e\"}]}]}}"));
 	}
 }
