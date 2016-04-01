@@ -5,25 +5,25 @@ import javax.ws.rs.core.Response.Status;
 /**
  * An exception thrown in REST layer, outside of GraphQL parsing and execution.
  */
-public class BQGraphQLRestException extends RuntimeException {
+public class GraphQLRestException extends RuntimeException {
 
 	private static final long serialVersionUID = -1228276457093874409L;
 	
 	private Status status;
 
-	public BQGraphQLRestException() {
+	public GraphQLRestException() {
 		this(Status.INTERNAL_SERVER_ERROR);
 	}
 
-	public BQGraphQLRestException(Status status) {
+	public GraphQLRestException(Status status) {
 		this(status, null, null);
 	}
 
-	public BQGraphQLRestException(Status status, String message) {
+	public GraphQLRestException(Status status, String message) {
 		this(status, message, null);
 	}
 
-	public BQGraphQLRestException(Status status, String message, Throwable cause) {
+	public GraphQLRestException(Status status, String message, Throwable cause) {
 		super(message, cause);
 		this.status = status;
 	}

@@ -1,4 +1,4 @@
-package org.objectstyle.graphql.bootique.jaxrs;
+package org.objectstyle.graphql.bootique;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

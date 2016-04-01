@@ -7,19 +7,19 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.objectstyle.graphql.rest.BQGraphQLRestException;
+import org.objectstyle.graphql.rest.GraphQLRestException;
 import org.objectstyle.graphql.rest.MessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Provider
 @Singleton
-public class BQGraphQLRestExceptionMapper implements ExceptionMapper<BQGraphQLRestException> {
+public class GraphQLRestExceptionMapper implements ExceptionMapper<GraphQLRestException> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BQGraphQLRestExceptionMapper.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLRestExceptionMapper.class);
 
 	@Override
-	public Response toResponse(BQGraphQLRestException exception) {
+	public Response toResponse(GraphQLRestException exception) {
 
 		String message = exception.getMessage();
 		Status status = exception.getStatus();
