@@ -10,22 +10,8 @@
   <groupId>org.objectstyle.graphql.cayenne</groupId>
   <artifactId>org.objectstyle.graphql.cayenne</artifactId>
   <name>org.objectstyle.graphql.cayenne</name>
-  <url>http://maven.apache.org</url>  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
 
   <repositories>
-    <repository>
-      <id>central</id>
-      <url>https://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <!-- needed to get latest graphql-java builds -->
     <repository>
       <id>graphql-java</id>
       <url>http://dl.bintray.com/andimarek/graphql-java</url>
@@ -37,21 +23,10 @@
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.graphql-java</groupId>
       <artifactId>graphql-java</artifactId>
       <scope>compile</scope>
       <version>2016-01-02T08-49-39</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.apache.cayenne</groupId>
-    	<artifactId>cayenne-server</artifactId>
-    	<version>4.0.M3</version>
     </dependency>
   </dependencies>
 </project>
