@@ -4,26 +4,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.objectstyle.graphql</groupId>
-    <artifactId>graphql</artifactId>
+    <artifactId>graphql-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
   <groupId>org.objectstyle.graphql.bootique</groupId>
-  <artifactId>org.objectstyle.graphql.bootique</artifactId>
-  <name>org.objectstyle.graphql.bootique</name>
-  <url>http://maven.apache.org</url>
+  <artifactId>graphql-bootique</artifactId>
+  <name>graphql-bootique</name>
 
   <dependencies>
     <dependency>
       <groupId>org.objectstyle.graphql.rest</groupId>
-      <artifactId>org.objectstyle.graphql.rest</artifactId>
+      <artifactId>graphql-rest</artifactId>
       <version>0.1-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.objectstyle.graphql.cayenne</groupId>
-      <artifactId>org.objectstyle.graphql.cayenne</artifactId>
+      <artifactId>graphql-cayenne</artifactId>
       <version>0.1-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.nhl.bootique</groupId>

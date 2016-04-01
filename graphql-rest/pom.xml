@@ -4,13 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.objectstyle.graphql</groupId>
-    <artifactId>graphql</artifactId>
+    <artifactId>graphql-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
   <groupId>org.objectstyle.graphql.rest</groupId>
-  <artifactId>org.objectstyle.graphql.rest</artifactId>
-  <name>org.objectstyle.graphql.rest</name>
-  <url>http://maven.apache.org</url>
+  <artifactId>graphql-rest</artifactId>
+  <name>graphql-rest</name>
 
   <repositories>
     <repository>
