@@ -14,13 +14,13 @@ import org.objectstyle.graphql.rest.provider.MessageResponseWriter;
 
 public class GraphQLFeature implements Feature {
 
-	@Override
-	public boolean configure(FeatureContext context) {
-		context.register(MessageResponseWriter.class);
-		context.register(GraphQLRestExceptionMapper.class);
-		context.register(GraphQLRestQueryReader.class);
-		context.register(ExecutionResultWriter.class);
-		context.register(GraphQLResource.class);
-		return true;
-	}
+    @Override
+    public boolean configure(FeatureContext context) {
+        context.register(MessageResponseWriter.class);
+        context.register(GraphQLRestExceptionMapper.class);
+        context.register(GraphQLRestQueryReader.class);
+        context.register(ExecutionResultWriter.class);
+        context.register(GraphQLResource.class);
+        return true;
+    }
 }

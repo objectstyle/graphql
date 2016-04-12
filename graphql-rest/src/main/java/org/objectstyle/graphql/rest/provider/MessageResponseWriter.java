@@ -16,35 +16,35 @@ import com.google.inject.Inject;
 
 public class MessageResponseWriter implements MessageBodyWriter<MessageResponse> {
 
-	@Inject
-	private JsonWriter writer;
+    @Inject
+    private JsonWriter writer;
 
-	@Override
-	public long getSize(MessageResponse t, Class<?> type, Type genericType, Annotation[] annotations,
-			MediaType mediaType) {
-		return -1;
-	}
+    @Override
+    public long getSize(MessageResponse t, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType) {
+        return -1;
+    }
 
-	@Override
-	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return MessageResponse.class.isAssignableFrom(type);
-	}
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return MessageResponse.class.isAssignableFrom(type);
+    }
 
-	@Override
-	public void writeTo(MessageResponse t, Class<?> type, Type genericType, Annotation[] annotations,
-			MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-					throws IOException {
+    @Override
+    public void writeTo(MessageResponse t, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
+            throws IOException {
 
-		writer.write(entityStream, generator -> {
-			generator.writeStartObject();
+        writer.write(entityStream, generator -> {
+            generator.writeStartObject();
 
-			if (t.getMessage() != null) {
-				generator.writeStringField("message", t.getMessage());
-			}
+            if (t.getMessage() != null) {
+                generator.writeStringField("message", t.getMessage());
+            }
 
-			generator.writeEndObject();
-		});
+            generator.writeEndObject();
+        });
 
-	}
+    }
 
 }

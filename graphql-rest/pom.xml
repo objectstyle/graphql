@@ -1,38 +1,38 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.objectstyle.graphql</groupId>
-    <artifactId>graphql-parent</artifactId>
-    <version>0.1-SNAPSHOT</version>
-  </parent>
-  <groupId>org.objectstyle.graphql.rest</groupId>
-  <artifactId>graphql-rest</artifactId>
-  <name>graphql-rest</name>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.objectstyle.graphql</groupId>
+        <artifactId>graphql-parent</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+    <groupId>org.objectstyle.graphql.rest</groupId>
+    <artifactId>graphql-rest</artifactId>
+    <name>graphql-rest</name>
 
-  <repositories>
-    <repository>
-      <id>graphql-java</id>
-      <url>http://dl.bintray.com/andimarek/graphql-java</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-  </repositories>
-  
-  <dependencies>
-    <dependency>
-		<groupId>com.graphql-java</groupId>
-		<artifactId>graphql-java</artifactId>
-		<version>2016-01-02T08-49-39</version>
-		<scope>compile</scope>
-    </dependency>
-    <dependency>
-		<groupId>org.objectstyle.graphql.cayenne</groupId>
-		<artifactId>org.objectstyle.graphql.cayenne</artifactId>
-		<version>0.1-SNAPSHOT</version>
-		<scope>compile</scope>
-    </dependency>
-  </dependencies>
-  </project>
+    <repositories>
+        <repository>
+            <id>graphql-java</id>
+            <url>http://dl.bintray.com/andimarek/graphql-java</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>2016-01-02T08-49-39</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.objectstyle.graphql.cayenne</groupId>
+            <artifactId>graphql-cayenne</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>

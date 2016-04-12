@@ -22,42 +22,42 @@ import graphql.ExecutionResult;
 @Singleton
 public class ExecutionResultWriter implements MessageBodyWriter<ExecutionResult> {
 
-	@Inject
-	private JsonWriter writer;
+    @Inject
+    private JsonWriter writer;
 
-	@Override
-	public long getSize(ExecutionResult t, Class<?> type, Type genericType, Annotation[] annotations,
-			MediaType mediaType) {
-		return -1;
-	}
+    @Override
+    public long getSize(ExecutionResult t, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType) {
+        return -1;
+    }
 
-	@Override
-	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return ExecutionResult.class.isAssignableFrom(type);
-	}
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return ExecutionResult.class.isAssignableFrom(type);
+    }
 
-	@Override
-	public void writeTo(ExecutionResult t, Class<?> type, Type genericType, Annotation[] annotations,
-			MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-					throws IOException, WebApplicationException {
+    @Override
+    public void writeTo(ExecutionResult t, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
+            throws IOException, WebApplicationException {
 
-		writer.write(entityStream, generator -> {
+        writer.write(entityStream, generator -> {
 
-			generator.writeStartObject();
+            generator.writeStartObject();
 
-			// TODO: is it ok to rely on default serialization of data and
-			// errors?
+            // TODO: is it ok to rely on default serialization of data and
+            // errors?
 
-			if (t.getData() != null) {
-				generator.writeObjectField("data", t.getData());
-			}
+            if (t.getData() != null) {
+                generator.writeObjectField("data", t.getData());
+            }
 
-			if (t.getErrors() != null && !t.getErrors().isEmpty()) {
-				generator.writeObjectField("errors", t.getErrors());
-			}
+            if (t.getErrors() != null && !t.getErrors().isEmpty()) {
+                generator.writeObjectField("errors", t.getErrors());
+            }
 
-			generator.writeEndObject();
+            generator.writeEndObject();
 
-		});
-	}
+        });
+    }
 }

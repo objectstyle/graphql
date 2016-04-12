@@ -7,28 +7,28 @@ import javax.ws.rs.core.Response.Status;
  */
 public class GraphQLRestException extends RuntimeException {
 
-	private static final long serialVersionUID = -1228276457093874409L;
-	
-	private Status status;
+    private static final long serialVersionUID = -1228276457093874409L;
 
-	public GraphQLRestException() {
-		this(Status.INTERNAL_SERVER_ERROR);
-	}
+    private Status status;
 
-	public GraphQLRestException(Status status) {
-		this(status, null, null);
-	}
+    public GraphQLRestException() {
+        this(Status.INTERNAL_SERVER_ERROR);
+    }
 
-	public GraphQLRestException(Status status, String message) {
-		this(status, message, null);
-	}
+    public GraphQLRestException(Status status) {
+        this(status, null, null);
+    }
 
-	public GraphQLRestException(Status status, String message, Throwable cause) {
-		super(message, cause);
-		this.status = status;
-	}
+    public GraphQLRestException(Status status, String message) {
+        this(status, message, null);
+    }
 
-	public Status getStatus() {
-		return status;
-	}
+    public GraphQLRestException(Status status, String message, Throwable cause) {
+        super(message, cause);
+        this.status = status;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
 }

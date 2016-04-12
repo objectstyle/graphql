@@ -21,19 +21,19 @@ import com.google.inject.Inject;
 @Provider
 public class GraphQLRestQueryReader implements MessageBodyReader<GraphQLRestQuery> {
 
-	@Inject
-	private JsonReader jsonParser;
+    @Inject
+    private JsonReader jsonParser;
 
-	@Override
-	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return GraphQLRestQuery.class.isAssignableFrom(type);
-	}
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return GraphQLRestQuery.class.isAssignableFrom(type);
+    }
 
-	@Override
-	public GraphQLRestQuery readFrom(Class<GraphQLRestQuery> type, Type genericType, Annotation[] annotations,
-			MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
-					throws IOException, WebApplicationException {
+    @Override
+    public GraphQLRestQuery readFrom(Class<GraphQLRestQuery> type, Type genericType, Annotation[] annotations,
+                                     MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+            throws IOException, WebApplicationException {
 
-		return jsonParser.read(GraphQLRestQuery.class, entityStream);
-	}
+        return jsonParser.read(GraphQLRestQuery.class, entityStream);
+    }
 }

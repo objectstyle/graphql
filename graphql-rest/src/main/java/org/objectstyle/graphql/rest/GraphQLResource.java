@@ -12,6 +12,7 @@ import com.google.inject.Inject;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 
+
 /**
  * A REST resource exposing the GraphQL engine.
  */
@@ -20,16 +21,16 @@ import graphql.GraphQL;
 @Consumes(MediaType.APPLICATION_JSON)
 public class GraphQLResource {
 
-	@Inject
-	private GraphQL graphql;
+    @Inject
+    private GraphQL graphql;
 
-	@POST
-	public ExecutionResult execute(GraphQLRestQuery queryHolder) {
+    @POST
+    public ExecutionResult execute(GraphQLRestQuery queryHolder) {
 
-		if (queryHolder == null || queryHolder.getQuery() == null) {
-			throw new GraphQLRestException(Status.BAD_REQUEST, "No query");
-		}
+        if (queryHolder == null || queryHolder.getQuery() == null) {
+            throw new GraphQLRestException(Status.BAD_REQUEST, "No query");
+        }
 
-		return graphql.execute(queryHolder.getQuery());
-	}
+        return graphql.execute(queryHolder.getQuery());
+    }
 }
