@@ -1,3 +1,0 @@
-jetty:
-  connector:
-    port: 8081
