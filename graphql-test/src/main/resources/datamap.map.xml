@@ -3,7 +3,7 @@
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	 xsi:schemaLocation="http://cayenne.apache.org/schema/7/modelMap http://cayenne.apache.org/schema/7/modelMap.xsd"
 	 project-version="7">
-	<property name="defaultPackage" value="org.objectstyle.graphql.cayenne.it.fixture.cayenne"/>
+	<property name="defaultPackage" value="org.objectstyle.graphql.test.cayenne"/>
 	<property name="defaultSchema" value="utest"/>
 	<db-entity name="e1" schema="utest">
 		<db-attribute name="id" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
@@ -19,16 +19,16 @@
 		<db-attribute name="id" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="name" type="VARCHAR" length="200"/>
 	</db-entity>
-	<obj-entity name="E1" className="org.objectstyle.graphql.cayenne.it.fixture.cayenne.E1" dbEntityName="e1">
+	<obj-entity name="E1" className="org.objectstyle.graphql.test.cayenne.E1" dbEntityName="e1">
 		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
 	</obj-entity>
-	<obj-entity name="E2" className="org.objectstyle.graphql.cayenne.it.fixture.cayenne.E2" dbEntityName="e2">
+	<obj-entity name="E2" className="org.objectstyle.graphql.test.cayenne.E2" dbEntityName="e2">
 		<obj-attribute name="e1_id" type="java.lang.Integer" db-attribute-path="e1.id"/>
 		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
 	</obj-entity>
-	<obj-entity name="E3" className="org.objectstyle.graphql.cayenne.it.fixture.cayenne.E3" dbEntityName="e3">
+	<obj-entity name="E3" className="org.objectstyle.graphql.test.cayenne.E3" dbEntityName="e3">
 		<obj-attribute name="e2_id" type="java.lang.Integer" db-attribute-path="e2.id"/>
 		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>

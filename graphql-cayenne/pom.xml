@@ -29,5 +29,14 @@
             <scope>compile</scope>
             <version>2016-01-02T08-49-39</version>
         </dependency>
+
+        <!-- Test deps-->
+        <dependency>
+            <groupId>org.objectstyle.graphql.test</groupId>
+            <artifactId>graphql-test</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>
