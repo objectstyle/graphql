@@ -8,10 +8,13 @@ import org.objectstyle.graphql.cayenne.orm.SchemaTranslator;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import org.objectstyle.graphql.test.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class GraphQLTestFactory {
     private static GraphQL graphQL;
     private static TestFactory testFactory = new TestFactory();
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLTestFactory.class);
 
     GraphQLTestFactory() {
         graphQL = createGraphQL(createSchemaTranslator());
@@ -32,7 +35,7 @@ class GraphQLTestFactory {
     }
 
     String post_graphql_request(String request) {
-        System.out.println(request);
+        LOGGER.info(request);
         Object r = graphQL.execute(request).getData();
         return r == null ? "" : r.toString();
     }

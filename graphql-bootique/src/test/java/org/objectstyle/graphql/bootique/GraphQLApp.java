@@ -15,9 +15,12 @@ import org.apache.cayenne.configuration.server.ServerRuntime;
 import com.nhl.bootique.Bootique;
 
 import org.objectstyle.graphql.test.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GraphQLApp extends JettyTestFactory {
     private TestFactory testFactory;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLApp.class);
 
     protected GraphQLApp() {
 
@@ -43,7 +46,7 @@ public class GraphQLApp extends JettyTestFactory {
 
     protected Response postGraphQL(String graphQL) {
         String json = "{\"query\":\"" + graphQL + "\"}";
-        System.out.println(json);
+        LOGGER.info(json);
         Entity<String> e = Entity.entity(json, MediaType.APPLICATION_JSON);
         return ClientBuilder.newClient().target("http://localhost:8081/").request().post(e);
     }
