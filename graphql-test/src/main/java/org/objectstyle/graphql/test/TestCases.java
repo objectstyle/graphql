@@ -155,4 +155,12 @@ public abstract class TestCases {
         LOGGER.info(r);
         assertEquals(r, "{data:{E1:[{id:2,name:b,e2s:[{id:5,name:e},{id:4,name:d}]}]}}");
     }
+
+    @Test
+    public void testFragments() {
+        String r = postGraphqlRequest("{ E1 (id:2) { ...fragmentTest } } fragment fragmentTest on E1 {id name}");
+
+        LOGGER.info(r);
+        assertEquals(r, "{data:{E1:[{id:2,name:b}]}}");
+    }
 }

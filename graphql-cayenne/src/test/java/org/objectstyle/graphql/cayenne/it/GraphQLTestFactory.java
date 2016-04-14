@@ -36,7 +36,7 @@ class GraphQLTestFactory {
 
     String post_graphql_request(String request) {
         LOGGER.info(request);
-        Object r = graphQL.execute(request).getData();
+        Object r = graphQL.execute("query " + request).getData();
         return r == null ? "" : r.toString();
     }
 }
