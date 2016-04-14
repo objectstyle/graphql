@@ -3,28 +3,22 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.objectstyle.graphql</groupId>
         <artifactId>graphql-parent</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
+
     <groupId>org.objectstyle.graphql.rest</groupId>
     <artifactId>graphql-rest</artifactId>
     <name>graphql-rest</name>
 
+    <packaging>jar</packaging>
+
     <properties>
         <fasterxml-version>2.6.4</fasterxml-version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>graphql-java</id>
-            <url>http://dl.bintray.com/andimarek/graphql-java</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -43,14 +37,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.graphql-java</groupId>
-            <artifactId>graphql-java</artifactId>
-            <version>2016-01-02T08-49-39</version>
-        </dependency>
-        <dependency>
             <groupId>org.objectstyle.graphql.cayenne</groupId>
             <artifactId>graphql-cayenne</artifactId>
             <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -64,7 +58,11 @@
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>7.0</version>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.12</version>
         </dependency>
     </dependencies>
 </project>

@@ -3,6 +3,7 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.objectstyle.graphql</groupId>
         <artifactId>graphql-parent</artifactId>
@@ -12,6 +13,8 @@
     <groupId>org.objectstyle.graphql.bootique</groupId>
     <artifactId>graphql-bootique</artifactId>
     <name>graphql-bootique</name>
+
+    <packaging>jar</packaging>
     
     <dependencyManagement>
         <dependencies>
@@ -25,13 +28,7 @@
         </dependencies>
     </dependencyManagement>
 
-
     <dependencies>
-        <dependency>
-            <groupId>org.objectstyle.graphql.cayenne</groupId>
-            <artifactId>graphql-cayenne</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.objectstyle.graphql.rest</groupId>
             <artifactId>graphql-rest</artifactId>
@@ -53,6 +50,11 @@
             <groupId>com.nhl.bootique.jetty</groupId>
             <artifactId>bootique-jetty-test</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.12</version>
+        </dependency>
 
         <!-- Test deps-->
         <dependency>
@@ -64,6 +66,18 @@
             <groupId>org.objectstyle.graphql.test</groupId>
             <artifactId>graphql-test</artifactId>
             <version>0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.10.1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
