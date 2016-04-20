@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.objectstyle.graphql</groupId>
         <artifactId>graphql-parent</artifactId>
-        <version>0.1</version>
+        <version>0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>org.objectstyle.graphql.bootique</groupId>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.objectstyle.graphql.rest</groupId>
             <artifactId>graphql-rest</artifactId>
-            <version>0.1</version>
+            <version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.nhl.bootique</groupId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.objectstyle.graphql.test</groupId>
             <artifactId>graphql-test</artifactId>
-            <version>0.1</version>
+            <version>0.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
