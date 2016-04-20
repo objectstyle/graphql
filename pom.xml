@@ -4,7 +4,7 @@
 
     <groupId>org.objectstyle.graphql</groupId>
     <artifactId>graphql-parent</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -76,7 +76,7 @@
         <url>https://github.com/objectstyle/graphql</url>
         <connection>https://github.com/objectstyle/graphql</connection>
         <developerConnection>scm:git:ssh://git@github.com/objectstyle/graphql</developerConnection>
-        <tag>HEAD</tag>
+        <tag>graphql-parent-0.1</tag>
     </scm>
 
     <!-- Optional profile used to sign artifacts -->
