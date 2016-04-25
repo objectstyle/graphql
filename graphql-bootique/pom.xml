@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.objectstyle.graphql.rest</groupId>
             <artifactId>graphql-rest</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.nhl.bootique</groupId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.objectstyle.graphql.test</groupId>
             <artifactId>graphql-test</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

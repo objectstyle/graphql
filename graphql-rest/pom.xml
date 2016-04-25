@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.objectstyle.graphql.cayenne</groupId>
             <artifactId>graphql-cayenne</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

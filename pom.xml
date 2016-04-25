@@ -22,6 +22,8 @@
         <module>graphql-bootique</module>
         <module>graphql-cayenne</module>
         <module>graphql-test</module>
+        <module>graphql-webconsole</module>
+        <module>graphql-example</module>
     </modules>
 
     <build>

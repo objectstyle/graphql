@@ -35,7 +35,7 @@
         <dependency>
             <groupId>org.objectstyle.graphql.test</groupId>
             <artifactId>graphql-test</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

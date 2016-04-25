@@ -1,0 +1,11 @@
+jdbc:
+  graphql:
+    url: jdbc:derby:target/derby/utest;create=true
+    driver: org.apache.derby.jdbc.EmbeddedDriver
+    minIdle: 1
+    maxIdle: 2
+    maxActive: 10
+
+cayenne:
+  datasource: graphql
+  createSchema: true
