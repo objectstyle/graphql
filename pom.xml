@@ -4,7 +4,7 @@
 
     <groupId>org.objectstyle.graphql</groupId>
     <artifactId>graphql-parent</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>GraphQL provider for RDBMS based on Apache Cayenne</description>
@@ -111,7 +111,7 @@
         <url>https://github.com/objectstyle/graphql</url>
         <connection>https://github.com/objectstyle/graphql</connection>
         <developerConnection>scm:git:ssh://git@github.com/objectstyle/graphql</developerConnection>
-        <tag>graphql-parent-0.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <developers>
