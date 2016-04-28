@@ -25,8 +25,6 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
         SchemaBuilder schemaBuilder = SchemaBuilder.newSchemaBuilder()
                 .objectContext(selectContext)
                 .entityResolver(cayenneSchema)
-                .excludeList(Arrays.asList("E2"))
-                .excludeList(Arrays.asList("E3"))
                 .build();
 
         return schemaBuilder.getGraphQLSchema();
