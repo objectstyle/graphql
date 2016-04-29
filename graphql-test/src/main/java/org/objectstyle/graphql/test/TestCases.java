@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 public abstract class TestCases {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestCases.class);

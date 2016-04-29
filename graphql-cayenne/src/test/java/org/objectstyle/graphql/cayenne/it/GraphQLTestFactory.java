@@ -6,7 +6,6 @@ import org.objectstyle.graphql.cayenne.orm.DefaultSchemaTranslator;
 import org.objectstyle.graphql.cayenne.orm.SchemaTranslator;
 
 import graphql.GraphQL;
-import graphql.schema.GraphQLSchema;
 import org.objectstyle.graphql.test.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +25,7 @@ class GraphQLTestFactory {
     }
 
     private static GraphQL createGraphQL(SchemaTranslator translator) {
-        GraphQLSchema schema = translator.toGraphQL(testFactory.getServerRuntime().getChannel().getEntityResolver());
-        return new GraphQL(schema);
+        return new GraphQL(translator.toGraphQL());
     }
 
     private static SchemaTranslator createSchemaTranslator() {

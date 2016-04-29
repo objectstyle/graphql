@@ -13,19 +13,15 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class SchemaBuilder {
+class SchemaBuilder {
     private ConcurrentMap<Class<?>, GraphQLScalarType> typeCache;
     private GraphQLSchema graphQLSchema;
     private ObjectContext objectContext;
 
-    private List<String> includeList;
-    private List<String> excludeList;
+    private final List<String> includeEntities = new ArrayList<>();
+    private final List<String> excludeEntities = new ArrayList<>();
 
-    SchemaBuilder(ObjectContext objectContext, EntityResolver entityResolver, List<String> includeList, List<String> excludeList) {
-        this.objectContext = objectContext;
-        this.includeList = includeList;
-        this.excludeList = excludeList;
-
+    private SchemaBuilder initialize() {
         this.typeCache = new ConcurrentHashMap<>();
 
         typeCache.put(Boolean.class, Scalars.GraphQLBoolean);
@@ -49,24 +45,24 @@ public class SchemaBuilder {
         typeCache.put(Double.TYPE, Scalars.GraphQLFloat);
         typeCache.put(BigDecimal.class, Scalars.GraphQLFloat);
 
-        Set entityTypes = entityTypes(entityResolver);
+        Set entityTypes = entityTypes(objectContext.getEntityResolver());
         GraphQLObjectType rootQueryType = queryType(entityTypes);
 
         graphQLSchema = GraphQLSchema.newSchema().query(rootQueryType).build(entityTypes);
+
+        return this;
     }
 
-    protected GraphQLObjectType queryType(Set<GraphQLObjectType> entityTypes) {
+    private GraphQLObjectType queryType(Set<GraphQLObjectType> entityTypes) {
         GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name("root");
 
         // naive... root type should be a user-visible builder
 
         // ... create select operations for all entities
         entityTypes.forEach(et -> {
-            List<GraphQLArgument> argList = new ArrayList<GraphQLArgument>();
+            List<GraphQLArgument> argList = new ArrayList<>();
 
-            et.getFieldDefinitions().forEach(fd -> {
-                argList.addAll(fd.getArguments());
-            });
+            et.getFieldDefinitions().forEach(fd -> argList.addAll(fd.getArguments()));
 
             argList.addAll(createDefaultFilters());
 
@@ -82,11 +78,9 @@ public class SchemaBuilder {
 
         // ... create search by field operations for all entities
         entityTypes.forEach(et -> {
-            List<GraphQLArgument> argList = new ArrayList<GraphQLArgument>();
+            List<GraphQLArgument> argList = new ArrayList<>();
 
-            et.getFieldDefinitions().forEach(fd -> {
-                argList.addAll(fd.getArguments());
-            });
+            et.getFieldDefinitions().forEach(fd -> argList.addAll(fd.getArguments()));
 
             argList.addAll(createDefaultFilters());
 
@@ -103,7 +97,7 @@ public class SchemaBuilder {
         return typeBuilder.build();
     }
 
-    protected Set<GraphQLObjectType> entityTypes(EntityResolver cayenneSchema) {
+    private Set<GraphQLObjectType> entityTypes(EntityResolver cayenneSchema) {
 
         Set<GraphQLObjectType> types = new HashSet<>();
 
@@ -130,15 +124,13 @@ public class SchemaBuilder {
                     continue;
                 }
 
-                List<GraphQLArgument> argList = new ArrayList<GraphQLArgument>();
+                List<GraphQLArgument> argList = new ArrayList<>();
 
-                or.getTargetEntity().getAttributes().forEach(tea -> {
-                    argList.add(GraphQLArgument
-                            .newArgument()
-                            .name(tea.getName())
-                            .type(mapType(tea.getJavaClass()))
-                            .build());
-                });
+                or.getTargetEntity().getAttributes().forEach(tea -> argList.add(GraphQLArgument
+                        .newArgument()
+                        .name(tea.getName())
+                        .type(mapType(tea.getJavaClass()))
+                        .build()));
 
                 argList.addAll(createDefaultFilters());
 
@@ -157,8 +149,8 @@ public class SchemaBuilder {
         return types;
     }
 
-    protected List<GraphQLArgument> createDefaultFilters() {
-        List<GraphQLArgument> argList = new ArrayList<GraphQLArgument>();
+    private List<GraphQLArgument> createDefaultFilters() {
+        List<GraphQLArgument> argList = new ArrayList<>();
 
         new DefaultFilters().getFilters().forEach((k, v) -> {
             if (k != FilterType.UNDEFINED) {
@@ -173,18 +165,16 @@ public class SchemaBuilder {
         return argList;
     }
 
-    protected GraphQLScalarType mapType(Class<?> javaType) {
-        return typeCache.computeIfAbsent(javaType, jt -> {
-            return Scalars.GraphQLString;
-        });
+    private GraphQLScalarType mapType(Class<?> javaType) {
+        return typeCache.computeIfAbsent(javaType, jt -> Scalars.GraphQLString);
     }
 
-    protected boolean isValidField(String name) {
-        if (!includeList.isEmpty() && !includeList.contains(name)) {
+    private boolean isValidField(String name) {
+        if (!includeEntities.isEmpty() && !includeEntities.contains(name)) {
             return false;
         }
 
-        if (!excludeList.isEmpty() && excludeList.contains(name)) {
+        if (!excludeEntities.isEmpty() && excludeEntities.contains(name)) {
             return false;
         }
 
@@ -200,34 +190,45 @@ public class SchemaBuilder {
     }
 
     public static class Builder {
-        private ObjectContext objectContext;
-        private EntityResolver entityResolver;
-        private final List<String> includeList = new ArrayList<>();
-        private final List<String> excludeList = new ArrayList<>();
+        private SchemaBuilder schemaBuilder;
+
+
+        private Builder() {
+            this.schemaBuilder = new SchemaBuilder();
+        }
 
         public Builder objectContext(ObjectContext objectContext) {
-            this.objectContext = objectContext;
+            schemaBuilder.objectContext = objectContext;
             return this;
         }
 
-        public Builder entityResolver(EntityResolver entityResolver) {
-            this.entityResolver = entityResolver;
+        public Builder includeEntities(Object... entities) {
+            fillList(schemaBuilder.includeEntities, entities);
             return this;
         }
 
-        public Builder includeList(List<String> includeList) {
-            this.includeList.addAll(includeList);
+        public Builder excludeEntities(Object... entities) {
+            fillList(schemaBuilder.excludeEntities, entities);
             return this;
         }
 
-        public Builder excludeList(List<String> excludeList) {
-            this.excludeList.addAll(excludeList);
+        private void fillList(List<String> list, Object... entities) {
+            Arrays.asList(entities).forEach(e -> {
+                if (e instanceof String) {
+                    list.add(e.toString());
+                }
 
-            return this;
+                if (e instanceof Class) {
+                    ObjEntity oe = schemaBuilder.objectContext.getEntityResolver().getObjEntity(((Class) e).getSimpleName());
+                    if (oe != null) {
+                        list.add(oe.getName());
+                    }
+                }
+            });
         }
 
-        public SchemaBuilder build() {
-            return new SchemaBuilder(objectContext, entityResolver, includeList, excludeList);
+        public GraphQLSchema build() {
+            return schemaBuilder.initialize().getGraphQLSchema();
         }
     }
 }

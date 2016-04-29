@@ -32,8 +32,8 @@ public class GraphQLModule extends ConfigModule {
 
 	@Provides
 	@Singleton
-	GraphQL createGraphQL(ServerRuntime cayenneRuntime, SchemaTranslator translator) {
-		GraphQLSchema schema = translator.toGraphQL(cayenneRuntime.getChannel().getEntityResolver());
+	GraphQL createGraphQL(SchemaTranslator translator) {
+		GraphQLSchema schema = translator.toGraphQL();
 		return new GraphQL(schema);
 	}
 
