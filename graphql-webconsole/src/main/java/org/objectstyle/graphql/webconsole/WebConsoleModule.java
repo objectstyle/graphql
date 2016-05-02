@@ -13,6 +13,6 @@ public class WebConsoleModule extends ConfigModule {
 	@Override
 	public void configure(Binder binder) {
         MappedServlet mappedServlet = new MappedServlet(new WebConsoleServlet(), new HashSet<>(Arrays.asList("/graphiql/*")));
-		JettyModule.contributeServlets(binder).addBinding().toInstance(mappedServlet);
+		JettyModule.contributeMappedServlets(binder).addBinding().toInstance(mappedServlet);
 	}
 }
