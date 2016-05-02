@@ -1,6 +1,6 @@
 jdbc:
   graphql:
-    url: jdbc:derby:target/derby/utest;create=true
+    url: jdbc:derby:target/derby/example;create=true
     driver: org.apache.derby.jdbc.EmbeddedDriver
     minIdle: 1
     maxIdle: 2

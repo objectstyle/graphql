@@ -1,64 +1,65 @@
 package org.objectstyle.graphql.example;
 
-import com.nhl.bootique.BQRuntime;
-import com.nhl.bootique.Bootique;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.query.SQLTemplate;
-import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import com.google.inject.Binder;
+import com.google.inject.Inject;
+import com.google.inject.Module;
+import com.nhl.bootique.Bootique;
 
 /**
  * GraphQL server runner with example schema.
  */
-public class Main {
-    private static ObjectContext objectContext;
+public class Main implements Module {
 
-    public static void main(String[] args) {
+	private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-        removeDerby();
-
-		BQRuntime runtime = Bootique.app(args).autoLoadModules().createRuntime();
-
-        ServerRuntime serverRuntime = runtime.getInstance(ServerRuntime.class);
-
-        createDymmyData(serverRuntime);
-
-        runtime.getRunner().run();
+	public static void main(String[] args) {
+		Bootique.app(args).autoLoadModules().module(Main.class).run();
 	}
 
-    private static void createDymmyData(ServerRuntime serverRuntime) {
-        objectContext = serverRuntime.newContext();
+	@Override
+	public void configure(Binder binder) {
+		binder.bind(TestDataLoader.class).asEagerSingleton();
+	}
 
-        for(int i = 0 ; i < 26; i++) {
-            String name = String.valueOf((char)(i + 65));
+	static class TestDataLoader {
 
-            insert("e1", "id, name",
-                    String.format("%d, '%s'", i, name));
+		@Inject
+		public TestDataLoader(ServerRuntime runtime) {
+			Path derbyDir = Paths.get("target", "derby", "example");
 
-            insert("e2", "id, name, e1_id",
-                    String.format("%d, '%s', %d", i + 26, String.format("%s%s", name, name), i % 5));
-
-            insert("e3", "id, name, e2_id",
-                    String.format("%d, '%s', %d", i + 52, String.format("%s%s%s", name, name, name), 26 + i % 5));
-        }
-    }
-
-    private static void removeDerby(){
-		File derbyDir = new File("target/derby");
-		if (derbyDir.isDirectory()) {
-			try {
-				FileUtils.deleteDirectory(derbyDir);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+			if (Files.isDirectory(derbyDir)) {
+				LOGGER.info("Existing Derby database is detected at " + derbyDir);
+			} else {
+				LOGGER.info("Creating a new Derby database at " + derbyDir);
+				createDummyData(runtime.newContext());
 			}
 		}
-	}
 
-    private static void insert(String table, String columns, String values) {
-        String insertSql = "INSERT INTO utest." + table + " (" + columns + ") VALUES (" + values + ")";
-        objectContext.performGenericQuery(new SQLTemplate(table, insertSql));
-    }
+		private void createDummyData(ObjectContext context) {
+
+			for (int i = 0; i < 26; i++) {
+				String name = String.valueOf((char) (i + 65));
+				insert(context, "e1", "id, name", String.format("%d, '%s'", i, name));
+				insert(context, "e2", "id, name, e1_id",
+						String.format("%d, '%s', %d", i + 26, String.format("%s%s", name, name), i % 5));
+				insert(context, "e3", "id, name, e2_id",
+						String.format("%d, '%s', %d", i + 52, String.format("%s%s%s", name, name, name), 26 + i % 5));
+			}
+		}
+
+		private void insert(ObjectContext context, String table, String columns, String values) {
+			String insertSql = "INSERT INTO utest." + table + " (" + columns + ") VALUES (" + values + ")";
+			context.performGenericQuery(new SQLTemplate(table, insertSql));
+		}
+	}
 }
