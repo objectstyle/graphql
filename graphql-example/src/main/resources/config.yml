@@ -9,3 +9,6 @@ jdbc:
 cayenne:
   datasource: graphql
   createSchema: true
+
+jersey:
+  urlPattern: /graphql-rest/*
