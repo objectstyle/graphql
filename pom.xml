@@ -26,6 +26,19 @@
         <module>graphql-example</module>
     </modules>
 
+    <repositories>
+        <repository>
+            <id>bootique-snapshots</id>
+            <url>http://maven.objectstyle.org/nexus/content/repositories/bootique-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
