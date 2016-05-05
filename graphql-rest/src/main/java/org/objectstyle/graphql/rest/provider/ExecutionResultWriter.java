@@ -7,23 +7,23 @@ import java.lang.reflect.Type;
 
 import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.objectstyle.graphql.rest.json.JacksonReaderWriter;
 import org.objectstyle.graphql.rest.json.JsonWriter;
-
-import com.google.inject.Inject;
 
 import graphql.ExecutionResult;
 
 @Provider
 @Singleton
 public class ExecutionResultWriter implements MessageBodyWriter<ExecutionResult> {
-
-    @Inject
-    private JsonWriter writer;
+    @Context
+    Configuration config;
 
     @Override
     public long getSize(ExecutionResult t, Class<?> type, Type genericType, Annotation[] annotations,
@@ -40,6 +40,8 @@ public class ExecutionResultWriter implements MessageBodyWriter<ExecutionResult>
     public void writeTo(ExecutionResult t, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
             throws IOException, WebApplicationException {
+
+        JsonWriter writer = (JsonWriter) config.getProperty(JacksonReaderWriter.class.getName());
 
         writer.write(entityStream, generator -> {
 

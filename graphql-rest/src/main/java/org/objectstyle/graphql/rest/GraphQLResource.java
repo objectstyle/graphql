@@ -4,10 +4,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
-
-import com.google.inject.Inject;
 
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -20,9 +20,8 @@ import graphql.GraphQL;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class GraphQLResource {
-
-    @Inject
-    private GraphQL graphql;
+    @Context
+    Configuration config;
 
     @POST
     public ExecutionResult execute(GraphQLRestQuery queryHolder) {
@@ -30,6 +29,8 @@ public class GraphQLResource {
         if (queryHolder == null || queryHolder.getQuery() == null) {
             throw new GraphQLRestException(Status.BAD_REQUEST, "No query");
         }
+
+        GraphQL graphql = (GraphQL) config.getProperty(GraphQL.class.getName());
 
         return graphql.execute(queryHolder.getQuery());
     }

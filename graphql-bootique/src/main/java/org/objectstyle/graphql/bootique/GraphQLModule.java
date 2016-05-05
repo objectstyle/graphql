@@ -1,18 +1,15 @@
 package org.objectstyle.graphql.bootique;
 
+import com.google.inject.*;
 import com.nhl.bootique.jersey.JerseyModule;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 
-import org.objectstyle.graphql.rest.GraphQLFeature;
 import org.objectstyle.graphql.rest.json.JacksonReaderWriter;
 import org.objectstyle.graphql.rest.json.JsonReader;
 import org.objectstyle.graphql.rest.json.JsonWriter;
 import org.objectstyle.graphql.cayenne.orm.DefaultSchemaTranslator;
 import org.objectstyle.graphql.cayenne.orm.SchemaTranslator;
 
-import com.google.inject.Binder;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.nhl.bootique.ConfigModule;
 
 import graphql.GraphQL;
@@ -27,14 +24,14 @@ public class GraphQLModule extends ConfigModule {
 		binder.bind(JsonReader.class).to(JacksonReaderWriter.class);
 		binder.bind(JsonWriter.class).to(JacksonReaderWriter.class);
 
-		JerseyModule.contributeFeatures(binder).addBinding().to(GraphQLFeature.class);
+        JerseyModule.contributeFeatures(binder).addBinding().toProvider(GraphQLFeatureProvider.class);
 	}
 
 	@Provides
 	@Singleton
-	GraphQL createGraphQL(SchemaTranslator translator) {
+	GraphQL createGraphQL( SchemaTranslator translator) {
 		GraphQLSchema schema = translator.toGraphQL();
-		return new GraphQL(schema);
+        return new GraphQL(schema);
 	}
 
 	@Provides
@@ -42,5 +39,4 @@ public class GraphQLModule extends ConfigModule {
 	SchemaTranslator createSchemaTranslator(ServerRuntime cayenneRuntime) {
 		return new DefaultSchemaTranslator(cayenneRuntime.newContext());
 	}
-
 }
