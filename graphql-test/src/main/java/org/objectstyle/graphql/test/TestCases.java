@@ -102,6 +102,14 @@ public abstract class TestCases {
     }
 
     @Test
+    public void testDataQueryRelationshipsForE2_1() {
+        String r = postGraphqlRequest("{E2 (id:4) {id name e1 {id name e2s {id name e3s {id e2 {id name}} }}}}");
+
+        LOGGER.info(r);
+        assertEquals(r, "{data:{E2:[{id:4,name:d,e1:{id:2,name:b,e2s:[{id:4,name:d,e3s:[{id:6,e2:{id:4,name:d}},{id:7,e2:{id:4,name:d}}]},{id:5,name:e,e3s:[{id:8,e2:{id:5,name:e}}]}]}}]}}");
+    }
+
+    @Test
     public void testDataQueryRelationshipsForE3() {
         String r = postGraphqlRequest("{ E3 (id:6) { id name e2 {id name e1 {id name}} }}");
 

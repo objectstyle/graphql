@@ -9,27 +9,20 @@ import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.query.Ordering;
+import org.apache.cayenne.query.Select;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.cayenne.query.SortOrder;
 
+import graphql.schema.GraphQLList;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
-class DefaultDataFetcher implements DataFetcher {
+public class DefaultDataFetcher implements DataFetcher {
 
-	private String entity;
-	private ObjectContext context;
-	private String relationship = null;
+	private ObjectContext objectContext;
 
-	public DefaultDataFetcher(String entity, ObjectContext context) {
-		this.entity = entity;
-		this.context = context;
-	}
-	
-	public DefaultDataFetcher(String entity, ObjectContext context, String relationship) {
-		this.entity = entity;
-		this.context = context;
-		this.relationship = relationship;
+	public DefaultDataFetcher(ObjectContext objectContext) {
+		this.objectContext = objectContext;
 	}
 
 	@Override
@@ -37,8 +30,16 @@ class DefaultDataFetcher implements DataFetcher {
 		DefaultFilters df = new DefaultFilters();
 		Map<String, Object> params = new HashMap<String, Object>();
 		Map<FilterType, Object> filters = new HashMap<FilterType, Object>();
-		
-		environment.getArguments().forEach((k, v) -> {
+
+        Object type = environment.getFieldType();
+        String entityName;
+        if(type instanceof GraphQLList){
+            entityName = ((GraphQLList) type).getWrappedType().getName();
+        } else {
+            entityName = environment.getFieldType().getName();
+        }
+
+        environment.getArguments().forEach((k, v) -> {
 			if(v != null) {
 				if(df.isFilterName(k)) {
 					filters.put(df.getFilterType(k), v);
@@ -48,8 +49,8 @@ class DefaultDataFetcher implements DataFetcher {
 			}
 		});
 		
-		if(relationship != null) {
-			Object obj = ((DataObject)environment.getSource()).readProperty(relationship);
+		if(environment.getSource() != null) {
+			Object obj = ((DataObject)environment.getSource()).readProperty(environment.getFields().get(0).getName());
 					
 			if(params.isEmpty() && filters.isEmpty())
 				return obj;
@@ -64,13 +65,13 @@ class DefaultDataFetcher implements DataFetcher {
 			Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
 			return expression.filterObjects((List<?>)obj);
 		}
-			
+
         Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
-        SelectQuery<?> query = new SelectQuery<>(entity, expression);
+        SelectQuery<?> query = new SelectQuery<>(entityName, expression);
 			
         applyFilters(filters, query);
         
-		return query.select(context);
+		return query.select(objectContext);
 	}
 	
 	private void applyFilters(Map<FilterType, Object> filters, List<?> obj){
