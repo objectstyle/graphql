@@ -1,16 +1,11 @@
 package org.objectstyle.graphql.cayenne.orm;
 
-import graphql.ExecutionResult;
 import graphql.Scalars;
-import graphql.execution.ExecutionContext;
-import graphql.execution.SimpleExecutionStrategy;
-import graphql.language.*;
 import graphql.schema.*;
 import org.apache.cayenne.ObjectContext;
-import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.query.Select;
+import org.apache.cayenne.query.SelectQuery;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,11 +18,16 @@ public class SchemaBuilder {
     private ConcurrentMap<Class<?>, GraphQLScalarType> typeCache;
     private GraphQLSchema graphQLSchema;
     private ObjectContext objectContext;
-    private GraphQLObjectType rootQueryType = null;
     private Class<? extends DefaultDataFetcher> dataFetcher = DefaultDataFetcher.class;
 
-    private final List<String> includeEntities = new ArrayList<>();
-    private final List<String> excludeEntities = new ArrayList<>();
+    private EntityBuilder entityBuilder;
+
+    private Map<String, Select<?>> queries = new HashMap<>();
+
+    private SchemaBuilder(EntityBuilder entityBuilder) {
+        this.entityBuilder = entityBuilder;
+        this.objectContext = entityBuilder.getObjectContext();
+    }
 
     private SchemaBuilder initialize() {
         this.typeCache = new ConcurrentHashMap<>();
@@ -53,8 +53,8 @@ public class SchemaBuilder {
         typeCache.put(Double.TYPE, Scalars.GraphQLFloat);
         typeCache.put(BigDecimal.class, Scalars.GraphQLFloat);
 
-        Set entityTypes = entityTypes(objectContext.getEntityResolver());
-        rootQueryType = queryType(entityTypes);
+        Set entityTypes = entityTypes();
+        GraphQLObjectType rootQueryType = queryType(entityTypes);
 
         graphQLSchema = GraphQLSchema.newSchema().query(rootQueryType).build(entityTypes);
 
@@ -77,8 +77,6 @@ public class SchemaBuilder {
         GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name("root");
 
         // naive... root type should be a user-visible builder
-
-        // ... create select operations for all entities
         entityTypes.forEach(et -> {
             List<GraphQLArgument> argList = new ArrayList<>();
 
@@ -94,6 +92,7 @@ public class SchemaBuilder {
 
             argList.addAll(createDefaultFilters());
 
+            // ... create select operations for all entities
             GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
                     .name("all" + et.getName() + "s")
                     .type(new GraphQLList(et))
@@ -102,27 +101,9 @@ public class SchemaBuilder {
                     .build();
 
             typeBuilder.field(f);
-        });
 
-        // ... create search by field operations for all entities
-        entityTypes.forEach(et -> {
-            List<GraphQLArgument> argList = new ArrayList<>();
-
-            et.getFieldDefinitions().forEach(
-                    fd -> {
-                        if (fd.getType() instanceof GraphQLScalarType) {
-                            argList.add(GraphQLArgument
-                                    .newArgument()
-                                    .name(fd.getName())
-                                    .type((GraphQLInputType) fd.getType())
-                                    .build());
-                        }
-                    }
-            );
-
-            argList.addAll(createDefaultFilters());
-
-            GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
+            // ... create search by field operations for all entities
+            f = GraphQLFieldDefinition.newFieldDefinition()
                     .name(et.getName())
                     .type(new GraphQLList(et))
                     .argument(argList)
@@ -132,19 +113,56 @@ public class SchemaBuilder {
             typeBuilder.field(f);
         });
 
+        queries.forEach((k, v) -> {
+            GraphQLObjectType ot = null;
+            String entityName = null;
+
+            if (v instanceof SelectQuery) {
+                entityName = ((SelectQuery<?>) v).getRoot().toString();
+            }
+
+            for (GraphQLObjectType o : entityTypes) {
+                if (o.getName().equals(entityName)) {
+                    ot = o;
+                    break;
+                }
+            }
+
+            if (ot != null) {
+                List<GraphQLArgument> argList = new ArrayList<>();
+
+                ot.getFieldDefinitions().forEach(fd -> {
+                    if (fd.getType() instanceof GraphQLScalarType) {
+                        argList.add(GraphQLArgument
+                                .newArgument()
+                                .name(fd.getName())
+                                .type((GraphQLInputType) fd.getType())
+                                .build());
+                    }
+                });
+
+                argList.addAll(createDefaultFilters());
+
+                GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
+                        .name(k)
+                        .type(new GraphQLList(ot))
+                        .argument(argList)
+                        .dataFetcher(new CustomQueryDataFetcher(objectContext, v))
+                        .build();
+
+                typeBuilder.field(f);
+            }
+        });
+
         return typeBuilder.build();
     }
 
-    private Set<GraphQLObjectType> entityTypes(EntityResolver cayenneSchema) {
+    private Set<GraphQLObjectType> entityTypes() {
 
         Set<GraphQLObjectType> types = new HashSet<>();
 
-        for (ObjEntity oe : cayenneSchema.getObjEntities()) {
-            if (!isValidField(oe.getName())) {
-                continue;
-            }
-
-            GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name(oe.getName());
+        for (Entity oe : entityBuilder.getEntities()) {
+            GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name(oe.getObjEntity().getName());
 
             // add attributes
             oe.getAttributes().forEach(oa -> {
@@ -158,19 +176,19 @@ public class SchemaBuilder {
 
             // add relationships
             for (ObjRelationship or : oe.getRelationships()) {
-                if (!isValidField(or.getTargetEntityName())) {
-                    continue;
-                }
-
                 List<GraphQLArgument> argList = new ArrayList<>();
 
-                or.getTargetEntity().getAttributes().forEach(tea -> argList.add(GraphQLArgument
-                        .newArgument()
-                        .name(tea.getName())
-                        .type(mapType(tea.getJavaClass()))
-                        .build()));
+                Entity e = entityBuilder.getEntityByName(or.getTargetEntityName());
 
-                argList.addAll(createDefaultFilters());
+                if (e != null) {
+                    e.getAttributes().forEach(tea -> argList.add(GraphQLArgument
+                            .newArgument()
+                            .name(tea.getName())
+                            .type(mapType(tea.getJavaClass()))
+                            .build()));
+
+                    argList.addAll(createDefaultFilters());
+                }
 
                 GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
                         .name(or.getName())
@@ -208,78 +226,19 @@ public class SchemaBuilder {
         return typeCache.computeIfAbsent(javaType, jt -> Scalars.GraphQLString);
     }
 
-    private boolean isValidField(String name) {
-        if (!includeEntities.isEmpty() && !includeEntities.contains(name)) {
-            return false;
-        }
-
-        if (!excludeEntities.isEmpty())
-            if (excludeEntities.contains(name)) {
-                return false;
-            }
-
-        return true;
+    public static Builder newSchemaBuilder(EntityBuilder entityBuilder) {
+        return new Builder(entityBuilder);
     }
 
-    private ExecutionResult query(String propertyName, Select<?> query, String... selects) {
-        System.out.println(query.toString());
-        List<?> result = query.select(objectContext);
-
-
-        ExecutionStrategy executionStrategy = new ExecutionStrategy();
-        ExecutionContext context = new ExecutionContext();
-        context.setGraphQLSchema(graphQLSchema);
-        context.setExecutionStrategy(executionStrategy);
-
-        GraphQLFieldDefinition fd = rootQueryType.getFieldDefinition(propertyName);
-
-        Field fs = new Field(propertyName);
-
-        List<Selection> args = new ArrayList<>();
-
-        List<String> selectList = Arrays.asList(selects);
-
-        if(selectList.isEmpty()) {
-            fd.getArguments().forEach(a -> {
-                if(a.getType() instanceof GraphQLScalarType) {
-                    args.add(new Field(a.getName()));
-                }
-            });
-        } else {
-            selectList.forEach(s -> args.add(new Field(s)));
-        }
-
-        SelectionSet sel = new SelectionSet(args);
-
-        fs.setSelectionSet(sel);
-
-        return executionStrategy.completeValue(context, fd.getType(), Arrays.asList(fs), result);
-    }
-
-    private class ExecutionStrategy extends SimpleExecutionStrategy {
-        public ExecutionResult completeValue(ExecutionContext executionContext, GraphQLType fieldType, List<Field> fields, Object result) {
-            return super.completeValue(executionContext, fieldType, fields, result);
-        }
-    }
-
-    public static Builder newSchemaBuilder() {
-        return new Builder();
-    }
-
-    public GraphQLSchema getGraphQLSchema() {
+    private GraphQLSchema getGraphQLSchema() {
         return graphQLSchema;
     }
 
     public static class Builder {
         private SchemaBuilder schemaBuilder;
 
-        private Builder() {
-            this.schemaBuilder = new SchemaBuilder();
-        }
-
-        public Builder objectContext(ObjectContext objectContext) {
-            schemaBuilder.objectContext = objectContext;
-            return this;
+        private Builder(EntityBuilder entityBuilder) {
+            this.schemaBuilder = new SchemaBuilder(entityBuilder);
         }
 
         public Builder dataFetcher(Class<? extends DefaultDataFetcher> datafetcher) {
@@ -287,33 +246,9 @@ public class SchemaBuilder {
             return this;
         }
 
-        public Builder includeEntities(Object... entities) {
-            fillList(schemaBuilder.includeEntities, entities);
+        public Builder query(String propertyName, Select<?> query) {
+            schemaBuilder.queries.put(propertyName, query);
             return this;
-        }
-
-        public Builder excludeEntities(Object... entities) {
-            fillList(schemaBuilder.excludeEntities, entities);
-            return this;
-        }
-
-        private void fillList(List<String> list, Object... entities) {
-            Arrays.asList(entities).forEach(e -> {
-                if (e instanceof String) {
-                    list.add(e.toString());
-                }
-
-                if (e instanceof Class) {
-                    ObjEntity oe = schemaBuilder.objectContext.getEntityResolver().getObjEntity(((Class) e).getSimpleName());
-                    if (oe != null) {
-                        list.add(oe.getName());
-                    }
-                }
-            });
-        }
-
-        public ExecutionResult query(String propertyName, Select<?> query, String... selects){
-            return schemaBuilder.query(propertyName, query, selects);
         }
 
         public GraphQLSchema build() {
