@@ -89,7 +89,7 @@ public class EntityBuilder {
         return true;
     }
 
-    public static Builder newEntityBuilder(ObjectContext objectContext) {
+    public static Builder builder(ObjectContext objectContext) {
         return new Builder(objectContext);
     }
 

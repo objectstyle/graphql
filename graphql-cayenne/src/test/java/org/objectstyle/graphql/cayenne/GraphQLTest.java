@@ -6,9 +6,12 @@ import graphql.schema.GraphQLSchema;
 
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
+import org.apache.cayenne.query.ObjectSelect;
 import org.apache.cayenne.query.SelectQuery;
+
 import org.junit.Test;
 
+import org.objectstyle.graphql.cayenne.orm.CustomQueryDataFetcher;
 import org.objectstyle.graphql.cayenne.orm.DefaultDataFetcher;
 import org.objectstyle.graphql.cayenne.orm.EntityBuilder;
 import org.objectstyle.graphql.cayenne.orm.SchemaBuilder;
@@ -16,8 +19,8 @@ import org.objectstyle.graphql.cayenne.orm.SchemaBuilder;
 import org.objectstyle.graphql.test.TestFactory;
 import org.objectstyle.graphql.test.cayenne.E1;
 import org.objectstyle.graphql.test.cayenne.E2;
-
 import org.objectstyle.graphql.test.cayenne.E3;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +54,11 @@ public class GraphQLTest {
     @Test
     public void incudeOneEntityClassTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .includeEntities(E1.class)
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeOneEntityTest(new GraphQL(schema));
@@ -65,12 +67,11 @@ public class GraphQLTest {
     @Test
     public void incudeOneEntityStringTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .includeEntities("E1")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeOneEntityTest(new GraphQL(schema));
@@ -94,14 +95,13 @@ public class GraphQLTest {
     @Test
     public void incudeAllEntitiesClassTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .includeEntities(E1.class)
                 .includeEntities(E2.class)
                 .includeEntities(E3.class)
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeAllEntitiesTest(new GraphQL(schema));
@@ -110,14 +110,13 @@ public class GraphQLTest {
     @Test
     public void incudeAllEntitiesStringTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .includeEntities("E1")
                 .includeEntities("E2")
                 .includeEntities("E3")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeAllEntitiesTest(new GraphQL(schema));
@@ -142,12 +141,11 @@ public class GraphQLTest {
     @Test
     public void excludeOneEntityClassTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .excludeEntities(E2.class)
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         excludeOneEntityTest(new GraphQL(schema));
@@ -156,12 +154,11 @@ public class GraphQLTest {
     @Test
     public void excludeOneEntityStringTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .excludeEntities("E2")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         excludeOneEntityTest(new GraphQL(schema));
@@ -188,14 +185,13 @@ public class GraphQLTest {
     @Test
     public void excludeAllEntitiesClassTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .excludeEntities(E1.class)
                 .excludeEntities(E2.class)
                 .excludeEntities(E3.class)
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
 
@@ -205,14 +201,13 @@ public class GraphQLTest {
     @Test
     public void excludeAllEntitiesStringTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .excludeEntities("E1")
                 .excludeEntities("E2")
                 .excludeEntities("E3")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         excludeAllEntitiesTest(new GraphQL(schema));
@@ -231,12 +226,11 @@ public class GraphQLTest {
     @Test
     public void includeEntityProperyClassTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .includeEntityProperty(E1.class, "id")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
@@ -245,12 +239,11 @@ public class GraphQLTest {
     @Test
     public void includeEntityProperyStringTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .includeEntityProperty("E1", "id")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
@@ -259,12 +252,11 @@ public class GraphQLTest {
     @Test
     public void excludeEntityProperyClassTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .excludeEntityProperty(E1.class, "name")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
@@ -273,32 +265,131 @@ public class GraphQLTest {
     @Test
     public void excludeEntityProperyStringTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .excludeEntityProperty("E1", "name")
                 .build();
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
     }
 
     @Test
-    public void customQueryTest() {
+    public void dataFetcherStringTest() {
         EntityBuilder entityBuilder = EntityBuilder
-                .newEntityBuilder(testFactory.getObjectContext())
+                .builder(testFactory.getObjectContext())
                 .build();
 
-        Map<String, Object> params = new HashMap<String, Object>();
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+                .dataFetcher("E1", DefaultDataFetcher.class)
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { E1 { id name }}");
+
+        LOGGER.info(r.getData().toString());
+        assertEquals(r.getData().toString(), "{E1=[{id=1, name=a}, {id=2, name=b}]}");
+    }
+
+    @Test
+    public void dataFetcherClassTest() {
+        EntityBuilder entityBuilder = EntityBuilder
+                .builder(testFactory.getObjectContext())
+                .build();
+
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+                .dataFetcher(E1.class, DefaultDataFetcher.class)
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { E1 { id name }}");
+
+        LOGGER.info(r.getData().toString());
+        assertEquals(r.getData().toString(), "{E1=[{id=1, name=a}, {id=2, name=b}]}");
+    }
+
+    private void customQuery(GraphQL graphQL){
+        ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
+
+        LOGGER.info(r.getData().toString());
+        assertEquals(r.getData().toString(), "{testE1=[{id=1, name=a}]}");
+    }
+
+    @Test
+    public void selectQueryTest() {
+        EntityBuilder entityBuilder = EntityBuilder
+                .builder(testFactory.getObjectContext())
+                .build();
+
+        Map<String, Object> params = new HashMap<>();
 
         params.put("id", 1);
 
         Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
         SelectQuery<?> query = new SelectQuery<>("E1", expression);
 
-        GraphQLSchema schema = SchemaBuilder.newSchemaBuilder(entityBuilder)
-                .dataFetcher(DefaultDataFetcher.class)
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+                .query("testE1", query)
+                .build();
+
+        customQuery(new GraphQL(schema));
+    }
+
+    @Test
+    public void selectQueryDataFetcherTest() {
+        EntityBuilder entityBuilder = EntityBuilder
+                .builder(testFactory.getObjectContext())
+                .build();
+
+        Map<String, Object> params = new HashMap<>();
+
+        params.put("id", 1);
+
+        Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
+
+        SelectQuery<?> query = new SelectQuery<>("E1", expression);
+
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+                .query("testE1", query)
+                .customQueryDataFetcher("testE1", CustomQueryDataFetcher.class)
+                .build();
+
+        customQuery(new GraphQL(schema));
+    }
+
+    @Test
+    public void selectQueryExpressionTest() {
+        EntityBuilder entityBuilder = EntityBuilder
+                .builder(testFactory.getObjectContext())
+                .build();
+
+
+        SelectQuery<?> query = new SelectQuery<>("E1", ExpressionFactory.exp("id = $id"));
+
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+                .query("testE1", query)
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
+
+        LOGGER.info(r.getData().toString());
+        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
+    }
+
+    @Test
+    public void objectSelectTest() {
+        EntityBuilder entityBuilder = EntityBuilder
+                .builder(testFactory.getObjectContext())
+                .build();
+
+        ObjectSelect query = ObjectSelect.query(E1.class).where(E1.ID.eq(2));
+
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .query("testE1", query)
                 .build();
 
@@ -307,6 +398,26 @@ public class GraphQLTest {
         ExecutionResult r = graphQL.execute("query { testE1 { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{testE1=[{id=1, name=a}]}");
+        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
     }
+
+    /*@Test
+    public void objectSelectExpressionTest() {
+        EntityBuilder entityBuilder = EntityBuilder
+                .builder(testFactory.getObjectContext())
+                .build();
+
+        ObjectSelect query = ObjectSelect.query(E1.class).where(ExpressionFactory.exp("id = $id"));
+
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+                .query("testE1", query)
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { testE1 (id:1) { id name }}");
+
+        LOGGER.info(r.getData().toString());
+        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
+    }*/
 }

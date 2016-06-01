@@ -2,8 +2,13 @@ package org.objectstyle.graphql.cayenne.orm;
 
 import graphql.Scalars;
 import graphql.schema.*;
+import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.exp.Expression;
+import org.apache.cayenne.exp.parser.ASTObjPath;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.query.ObjectSelect;
 import org.apache.cayenne.query.Select;
 import org.apache.cayenne.query.SelectQuery;
 
@@ -18,7 +23,9 @@ public class SchemaBuilder {
     private ConcurrentMap<Class<?>, GraphQLScalarType> typeCache;
     private GraphQLSchema graphQLSchema;
     private ObjectContext objectContext;
-    private Class<? extends DefaultDataFetcher> dataFetcher = DefaultDataFetcher.class;
+
+    private Map<String, Class<? extends DataFetcher>> dataFetchers = new HashMap<>();
+    private Map<String, Class<? extends DataFetcher>> customQueryDataFetchers = new HashMap<>();
 
     private EntityBuilder entityBuilder;
 
@@ -61,11 +68,15 @@ public class SchemaBuilder {
         return this;
     }
 
-    private DataFetcher getDataFetcher() {
+    private DataFetcher getDataFetcher(String entity) {
         DataFetcher df = null;
 
         try {
-            df = dataFetcher.getConstructor(ObjectContext.class).newInstance(objectContext);
+            if (dataFetchers.containsKey(entity)) {
+                df = dataFetchers.get(entity).getConstructor(ObjectContext.class).newInstance(objectContext);
+            } else {
+                df = DefaultDataFetcher.class.getConstructor(ObjectContext.class).newInstance(objectContext);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,7 +108,7 @@ public class SchemaBuilder {
                     .name("all" + et.getName() + "s")
                     .type(new GraphQLList(et))
                     .argument(argList)
-                    .dataFetcher(getDataFetcher())
+                    .dataFetcher(getDataFetcher("all" + et.getName() + "s"))
                     .build();
 
             typeBuilder.field(f);
@@ -107,7 +118,7 @@ public class SchemaBuilder {
                     .name(et.getName())
                     .type(new GraphQLList(et))
                     .argument(argList)
-                    .dataFetcher(getDataFetcher())
+                    .dataFetcher(getDataFetcher(et.getName()))
                     .build();
 
             typeBuilder.field(f);
@@ -115,14 +126,11 @@ public class SchemaBuilder {
 
         queries.forEach((k, v) -> {
             GraphQLObjectType ot = null;
-            String entityName = null;
 
-            if (v instanceof SelectQuery) {
-                entityName = ((SelectQuery<?>) v).getRoot().toString();
-            }
+            ObjEntity oe = v.getMetaData(objectContext.getEntityResolver()).getObjEntity();
 
             for (GraphQLObjectType o : entityTypes) {
-                if (o.getName().equals(entityName)) {
+                if (o.getName().equals(oe.getName())) {
                     ot = o;
                     break;
                 }
@@ -131,23 +139,54 @@ public class SchemaBuilder {
             if (ot != null) {
                 List<GraphQLArgument> argList = new ArrayList<>();
 
-                ot.getFieldDefinitions().forEach(fd -> {
-                    if (fd.getType() instanceof GraphQLScalarType) {
-                        argList.add(GraphQLArgument
-                                .newArgument()
-                                .name(fd.getName())
-                                .type((GraphQLInputType) fd.getType())
-                                .build());
-                    }
-                });
+                Expression expr = null;
 
-                argList.addAll(createDefaultFilters());
+                if (v instanceof SelectQuery) {
+                    expr = ((SelectQuery) v).getQualifier();
+                }
+
+                if (v instanceof ObjectSelect) {
+                    expr = ((ObjectSelect) v).getWhere();
+                }
+
+                if(expr != null) {
+                    for (int i = 0; i < expr.getOperandCount(); i++) {
+                        Object operand = expr.getOperand(i);
+
+                        if (operand instanceof ASTObjPath) {
+                            String path = ((ASTObjPath) operand).getPath();
+
+                            ot.getFieldDefinitions().forEach(fd -> {
+                                if (fd.getName().equals(path) && fd.getType() instanceof GraphQLScalarType) {
+                                    argList.add(GraphQLArgument
+                                            .newArgument()
+                                            .name(fd.getName())
+                                            .type((GraphQLInputType) fd.getType())
+                                            .build());
+                                }
+                            });
+                        }
+                    }
+                }
+
+                DataFetcher df = null;
+
+                try {
+                    if (customQueryDataFetchers.containsKey(k)) {
+                        df = customQueryDataFetchers.get(k).getConstructor(ObjectContext.class, Select.class).newInstance(objectContext, v);
+                    } else {
+                        df = CustomQueryDataFetcher.class.getConstructor(ObjectContext.class, Select.class).newInstance(objectContext, v);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
                         .name(k)
                         .type(new GraphQLList(ot))
                         .argument(argList)
-                        .dataFetcher(new CustomQueryDataFetcher(objectContext, v))
+                        .dataFetcher(df)
                         .build();
 
                 typeBuilder.field(f);
@@ -194,7 +233,7 @@ public class SchemaBuilder {
                         .name(or.getName())
                         .argument(argList.stream().distinct().collect(Collectors.toList()))
                         .type(or.isToMany() ? new GraphQLList(new GraphQLTypeReference(or.getTargetEntityName())) : new GraphQLTypeReference(or.getTargetEntityName()))
-                        .dataFetcher(getDataFetcher())
+                        .dataFetcher(getDataFetcher(or.getName()))
                         .build();
 
                 typeBuilder.field(f);
@@ -226,7 +265,7 @@ public class SchemaBuilder {
         return typeCache.computeIfAbsent(javaType, jt -> Scalars.GraphQLString);
     }
 
-    public static Builder newSchemaBuilder(EntityBuilder entityBuilder) {
+    public static Builder builder(EntityBuilder entityBuilder) {
         return new Builder(entityBuilder);
     }
 
@@ -241,8 +280,25 @@ public class SchemaBuilder {
             this.schemaBuilder = new SchemaBuilder(entityBuilder);
         }
 
-        public Builder dataFetcher(Class<? extends DefaultDataFetcher> datafetcher) {
-            schemaBuilder.dataFetcher = datafetcher;
+        private ObjEntity getObjEntityByClass(Class<? extends CayenneDataObject> entity) {
+            return this.schemaBuilder.objectContext.getEntityResolver().getObjEntity(((Class) entity).getSimpleName());
+        }
+
+        public Builder dataFetcher(String entity, Class<? extends DataFetcher> dataFetcher) {
+            schemaBuilder.dataFetchers.put(entity, dataFetcher);
+            return this;
+        }
+
+        public Builder dataFetcher(Class<? extends CayenneDataObject> entity, Class<? extends DataFetcher> datafFetcher) {
+            ObjEntity oe = getObjEntityByClass(entity);
+            if (oe != null) {
+                return dataFetcher(oe.getName(), datafFetcher);
+            }
+            return this;
+        }
+
+        public Builder customQueryDataFetcher(String property, Class<? extends DataFetcher> datafetcher) {
+            schemaBuilder.customQueryDataFetchers.put(property, datafetcher);
             return this;
         }
 
