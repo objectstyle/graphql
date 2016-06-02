@@ -5,9 +5,8 @@ import graphql.schema.DataFetchingEnvironment;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
-import org.apache.cayenne.query.ObjectSelect;
-import org.apache.cayenne.query.Select;
-import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.query.*;
+import org.apache.cayenne.reflect.ClassDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +41,13 @@ public class CustomQueryDataFetcher implements DataFetcher {
         if (query instanceof ObjectSelect) {
             Expression expression = ((ObjectSelect) query).getWhere();
 
-            ((ObjectSelect) query).where(expression.params(params));
+            QueryMetadata md = query.getMetaData(objectContext.getEntityResolver());
+            ClassDescriptor cd = objectContext.getEntityResolver().getClassDescriptor(md.getObjEntity().getName());
+            query = ObjectSelect.query(cd.getObjectClass()).where(expression.params(params));
+        }
+
+        if (query instanceof SQLSelect) {
+            ((SQLSelect)query).params(params);
         }
 
         return query.select(objectContext);

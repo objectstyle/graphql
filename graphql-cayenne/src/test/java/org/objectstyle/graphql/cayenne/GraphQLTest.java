@@ -6,7 +6,9 @@ import graphql.schema.GraphQLSchema;
 
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
+import org.apache.cayenne.query.CapsStrategy;
 import org.apache.cayenne.query.ObjectSelect;
+import org.apache.cayenne.query.SQLSelect;
 import org.apache.cayenne.query.SelectQuery;
 
 import org.junit.Test;
@@ -401,7 +403,7 @@ public class GraphQLTest {
         assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
     }
 
-    /*@Test
+    @Test
     public void objectSelectExpressionTest() {
         EntityBuilder entityBuilder = EntityBuilder
                 .builder(testFactory.getObjectContext())
@@ -415,9 +417,32 @@ public class GraphQLTest {
 
         GraphQL graphQL = new GraphQL(schema);
 
-        ExecutionResult r = graphQL.execute("query { testE1 (id:1) { id name }}");
+        ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
 
         LOGGER.info(r.getData().toString());
         assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
-    }*/
+    }
+
+    @Test
+    public void sqlSelectExpressionTest() {
+        EntityBuilder entityBuilder = EntityBuilder
+                .builder(testFactory.getObjectContext())
+                .build();
+
+        SQLSelect<?> query = SQLSelect.query(E1.class,
+                "SELECT * FROM utest.E1 WHERE ID = #bind($id)").columnNameCaps(CapsStrategy.LOWER);
+
+        query.params("id", "$id");
+
+        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+                .query("testE1", query)
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
+
+        LOGGER.info(r.getData().toString());
+        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
+    }
 }

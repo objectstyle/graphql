@@ -9,6 +9,7 @@ import org.apache.cayenne.exp.parser.ASTObjPath;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.query.ObjectSelect;
+import org.apache.cayenne.query.SQLSelect;
 import org.apache.cayenne.query.Select;
 import org.apache.cayenne.query.SelectQuery;
 
@@ -167,6 +168,21 @@ public class SchemaBuilder {
                             });
                         }
                     }
+                }
+
+                if(v instanceof SQLSelect) {
+                    GraphQLObjectType finalOt = ot;
+                    ((SQLSelect) v).getParams().forEach((pk, pv) -> {
+                        finalOt.getFieldDefinitions().forEach(fd -> {
+                            if (fd.getName().equals(pk) && fd.getType() instanceof GraphQLScalarType) {
+                                argList.add(GraphQLArgument
+                                        .newArgument()
+                                        .name(fd.getName())
+                                        .type((GraphQLInputType) fd.getType())
+                                        .build());
+                            }
+                        });
+                    });
                 }
 
                 DataFetcher df = null;
