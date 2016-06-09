@@ -14,7 +14,7 @@ public class DefaultSchemaTranslator implements SchemaTranslator {
 
     @Override
     public GraphQLSchema toGraphQL() {
-        return SchemaBuilder.builder(EntityBuilder.builder(selectContext).build())
+        return SchemaBuilder.builder(selectContext)
                 .build();
     }
 }

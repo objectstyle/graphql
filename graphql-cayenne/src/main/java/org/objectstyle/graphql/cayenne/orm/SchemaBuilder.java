@@ -26,15 +26,12 @@ public class SchemaBuilder {
     private ObjectContext objectContext;
 
     private Map<String, Class<? extends DataFetcher>> dataFetchers = new HashMap<>();
-    private Map<String, Class<? extends DataFetcher>> customQueryDataFetchers = new HashMap<>();
 
     private EntityBuilder entityBuilder;
 
     private Map<String, Select<?>> queries = new HashMap<>();
 
-    private SchemaBuilder(EntityBuilder entityBuilder) {
-        this.entityBuilder = entityBuilder;
-        this.objectContext = entityBuilder.getObjectContext();
+    private SchemaBuilder() {
     }
 
     private SchemaBuilder initialize() {
@@ -79,7 +76,7 @@ public class SchemaBuilder {
                 df = DefaultDataFetcher.class.getConstructor(ObjectContext.class).newInstance(objectContext);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return df;
@@ -185,24 +182,11 @@ public class SchemaBuilder {
                     });
                 }
 
-                DataFetcher df = null;
-
-                try {
-                    if (customQueryDataFetchers.containsKey(k)) {
-                        df = customQueryDataFetchers.get(k).getConstructor(ObjectContext.class, Select.class).newInstance(objectContext, v);
-                    } else {
-                        df = CustomQueryDataFetcher.class.getConstructor(ObjectContext.class, Select.class).newInstance(objectContext, v);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
                 GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
                         .name(k)
                         .type(new GraphQLList(ot))
                         .argument(argList)
-                        .dataFetcher(df)
+                        .dataFetcher(new CustomQueryDataFetcher(objectContext, v))
                         .build();
 
                 typeBuilder.field(f);
@@ -281,8 +265,8 @@ public class SchemaBuilder {
         return typeCache.computeIfAbsent(javaType, jt -> Scalars.GraphQLString);
     }
 
-    public static Builder builder(EntityBuilder entityBuilder) {
-        return new Builder(entityBuilder);
+    public static Builder builder(ObjectContext objectContext) {
+        return new Builder(objectContext);
     }
 
     private GraphQLSchema getGraphQLSchema() {
@@ -291,9 +275,13 @@ public class SchemaBuilder {
 
     public static class Builder {
         private SchemaBuilder schemaBuilder;
+        private EntityBuilder.Builder entityBuilder;
 
-        private Builder(EntityBuilder entityBuilder) {
-            this.schemaBuilder = new SchemaBuilder(entityBuilder);
+        private Builder(ObjectContext objectContext) {
+            this.schemaBuilder = new SchemaBuilder();
+            this.schemaBuilder.objectContext = objectContext;
+
+            this.entityBuilder = EntityBuilder.builder(objectContext);
         }
 
         private ObjEntity getObjEntityByClass(Class<? extends CayenneDataObject> entity) {
@@ -305,16 +293,11 @@ public class SchemaBuilder {
             return this;
         }
 
-        public Builder dataFetcher(Class<? extends CayenneDataObject> entity, Class<? extends DataFetcher> datafFetcher) {
+        public Builder dataFetcher(Class<? extends CayenneDataObject> entity, Class<? extends DataFetcher> dataFetcher) {
             ObjEntity oe = getObjEntityByClass(entity);
             if (oe != null) {
-                return dataFetcher(oe.getName(), datafFetcher);
+                return dataFetcher(oe.getName(), dataFetcher);
             }
-            return this;
-        }
-
-        public Builder customQueryDataFetcher(String property, Class<? extends DataFetcher> datafetcher) {
-            schemaBuilder.customQueryDataFetchers.put(property, datafetcher);
             return this;
         }
 
@@ -323,7 +306,50 @@ public class SchemaBuilder {
             return this;
         }
 
+        public Builder includeEntities(String... entities) {
+            this.entityBuilder.includeEntities(entities);
+            return this;
+        }
+
+        @SafeVarargs
+        public final Builder includeEntities(Class<? extends CayenneDataObject>... entities) {
+            this.entityBuilder.includeEntities(entities);
+            return this;
+        }
+
+        public Builder excludeEntities(String... entities) {
+            this.entityBuilder.excludeEntities(entities);
+            return this;
+        }
+
+        @SafeVarargs
+        public final Builder excludeEntities(Class<? extends CayenneDataObject>... entities) {
+            this.entityBuilder.excludeEntities(entities);
+            return this;
+        }
+
+        public Builder includeEntityProperty(Class<? extends CayenneDataObject> entity, String... properties) {
+            this.entityBuilder.includeEntityProperty(entity, properties);
+            return this;
+        }
+
+        public Builder includeEntityProperty(String entity, String... properties) {
+            this.entityBuilder.includeEntityProperty(entity, properties);
+            return this;
+        }
+
+        public Builder excludeEntityProperty(Class<? extends CayenneDataObject> entity, String... properties) {
+            this.entityBuilder.excludeEntityProperty(entity, properties);
+            return this;
+        }
+
+        public Builder excludeEntityProperty(String entity, String... properties) {
+            this.entityBuilder.excludeEntityProperty(entity, properties);
+            return this;
+        }
+
         public GraphQLSchema build() {
+            this.schemaBuilder.entityBuilder = this.entityBuilder.build();
             return schemaBuilder.initialize().getGraphQLSchema();
         }
     }

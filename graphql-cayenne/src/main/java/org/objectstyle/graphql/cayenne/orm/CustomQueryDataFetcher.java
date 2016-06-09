@@ -32,22 +32,22 @@ public class CustomQueryDataFetcher implements DataFetcher {
             }
         });
 
-        if (query instanceof SelectQuery) {
-            Expression expression = ((SelectQuery) query).getQualifier();
-
-            ((SelectQuery) query).setQualifier(expression.params(params));
-        }
 
         if (query instanceof ObjectSelect) {
             Expression expression = ((ObjectSelect) query).getWhere();
 
             QueryMetadata md = query.getMetaData(objectContext.getEntityResolver());
+
             ClassDescriptor cd = objectContext.getEntityResolver().getClassDescriptor(md.getObjEntity().getName());
             query = ObjectSelect.query(cd.getObjectClass()).where(expression.params(params));
         }
 
         if (query instanceof SQLSelect) {
-            ((SQLSelect)query).params(params);
+            query = ((SQLSelect)query).params(params);
+        }
+
+        if (query instanceof SelectQuery) {
+            query = ((SelectQuery)query).createQuery(params);
         }
 
         return query.select(objectContext);

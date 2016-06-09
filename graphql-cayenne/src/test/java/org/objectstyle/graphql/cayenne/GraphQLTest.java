@@ -6,10 +6,7 @@ import graphql.schema.GraphQLSchema;
 
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
-import org.apache.cayenne.query.CapsStrategy;
-import org.apache.cayenne.query.ObjectSelect;
-import org.apache.cayenne.query.SQLSelect;
-import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.query.*;
 
 import org.junit.Test;
 
@@ -39,28 +36,24 @@ public class GraphQLTest {
     private void incudeOneEntityTest(GraphQL graphQL) {
         ExecutionResult r = graphQL.execute("query { E1 (id:1) { id name}}");
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E1=[{id=1, name=a}]}");
+        assertEquals("{E1=[{id=1, name=a}]}", r.getData().toString());
 
         r = graphQL.execute("query { E2 (id:3) { id name}}");
-        assertEquals(r.getData(), null);
-        assertEquals(r.getErrors().get(0).getErrorType(), ValidationError);
-        assertEquals(r.getErrors().get(0).getMessage(), "Validation error of type FieldUndefined: Field E2 is undefined");
+        assertEquals(null, r.getData());
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type FieldUndefined: Field E2 is undefined", r.getErrors().get(0).getMessage());
 
 
         r = graphQL.execute("query { E3 (id:6) { id name}}");
-        assertEquals(r.getData(), null);
-        assertEquals(r.getErrors().get(0).getErrorType(), ValidationError);
-        assertEquals(r.getErrors().get(0).getMessage(), "Validation error of type FieldUndefined: Field E3 is undefined");
+        assertEquals(null, r.getData());
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type FieldUndefined: Field E3 is undefined", r.getErrors().get(0).getMessage());
     }
 
     @Test
     public void incudeOneEntityClassTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .includeEntities(E1.class)
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeOneEntityTest(new GraphQL(schema));
@@ -68,12 +61,8 @@ public class GraphQLTest {
 
     @Test
     public void incudeOneEntityStringTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .includeEntities("E1")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeOneEntityTest(new GraphQL(schema));
@@ -82,28 +71,24 @@ public class GraphQLTest {
     private void incudeAllEntitiesTest(GraphQL graphQL) {
         ExecutionResult r = graphQL.execute("query { E1 (id:1) { id name}}");
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E1=[{id=1, name=a}]}");
+        assertEquals("{E1=[{id=1, name=a}]}", r.getData().toString());
 
         r = graphQL.execute("query { E2 (id:3) { id name}}");
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E2=[{id=3, name=c}]}");
+        assertEquals("{E2=[{id=3, name=c}]}", r.getData().toString());
 
 
         r = graphQL.execute("query { E3 (id:6) { id name}}");
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E3=[{id=6, name=f}]}");
+        assertEquals("{E3=[{id=6, name=f}]}", r.getData().toString());
     }
 
     @Test
     public void incudeAllEntitiesClassTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .includeEntities(E1.class)
                 .includeEntities(E2.class)
                 .includeEntities(E3.class)
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeAllEntitiesTest(new GraphQL(schema));
@@ -111,14 +96,10 @@ public class GraphQLTest {
 
     @Test
     public void incudeAllEntitiesStringTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .includeEntities("E1")
                 .includeEntities("E2")
                 .includeEntities("E3")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         incudeAllEntitiesTest(new GraphQL(schema));
@@ -127,27 +108,23 @@ public class GraphQLTest {
     private void excludeOneEntityTest(GraphQL graphQL) {
         ExecutionResult r = graphQL.execute("query { E1 (id:1) { id name}}");
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E1=[{id=1, name=a}]}");
+        assertEquals("{E1=[{id=1, name=a}]}", r.getData().toString());
 
         r = graphQL.execute("query { E2 (id:3) { id name}}");
-        assertEquals(r.getData(), null);
-        assertEquals(r.getErrors().get(0).getErrorType(), ValidationError);
-        assertEquals(r.getErrors().get(0).getMessage(), "Validation error of type FieldUndefined: Field E2 is undefined");
+        assertEquals(null, r.getData());
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type FieldUndefined: Field E2 is undefined", r.getErrors().get(0).getMessage());
 
 
         r = graphQL.execute("query { E3 (id:6) { id name}}");
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E3=[{id=6, name=f}]}");
+        assertEquals("{E3=[{id=6, name=f}]}", r.getData().toString());
     }
 
     @Test
     public void excludeOneEntityClassTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .excludeEntities(E2.class)
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         excludeOneEntityTest(new GraphQL(schema));
@@ -155,12 +132,8 @@ public class GraphQLTest {
 
     @Test
     public void excludeOneEntityStringTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .excludeEntities("E2")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         excludeOneEntityTest(new GraphQL(schema));
@@ -168,48 +141,39 @@ public class GraphQLTest {
 
     private void excludeAllEntitiesTest(GraphQL graphQL) {
         ExecutionResult r = graphQL.execute("query { E1 (id:1) { id name}}");
-        assertEquals(r.getData(), null);
-        assertEquals(r.getErrors().get(0).getErrorType(), ValidationError);
-        assertEquals(r.getErrors().get(0).getMessage(), "Validation error of type FieldUndefined: Field E1 is undefined");
+        assertEquals(null, r.getData());
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type FieldUndefined: Field E1 is undefined", r.getErrors().get(0).getMessage());
 
         r = graphQL.execute("query { E2 (id:3) { id name}}");
-        assertEquals(r.getData(), null);
-        assertEquals(r.getErrors().get(0).getErrorType(), ValidationError);
-        assertEquals(r.getErrors().get(0).getMessage(), "Validation error of type FieldUndefined: Field E2 is undefined");
+        assertEquals(null, r.getData());
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type FieldUndefined: Field E2 is undefined", r.getErrors().get(0).getMessage());
 
 
         r = graphQL.execute("query { E3 (id:6) { id name}}");
-        assertEquals(r.getData(), null);
-        assertEquals(r.getErrors().get(0).getErrorType(), ValidationError);
-        assertEquals(r.getErrors().get(0).getMessage(), "Validation error of type FieldUndefined: Field E3 is undefined");
+        assertEquals(null, r.getData());
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type FieldUndefined: Field E3 is undefined", r.getErrors().get(0).getMessage());
     }
 
     @Test
     public void excludeAllEntitiesClassTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .excludeEntities(E1.class)
                 .excludeEntities(E2.class)
                 .excludeEntities(E3.class)
                 .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
-                .build();
-
 
         excludeAllEntitiesTest(new GraphQL(schema));
     }
 
     @Test
     public void excludeAllEntitiesStringTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .excludeEntities("E1")
                 .excludeEntities("E2")
                 .excludeEntities("E3")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         excludeAllEntitiesTest(new GraphQL(schema));
@@ -218,21 +182,17 @@ public class GraphQLTest {
     private void entityProperyTest(GraphQL graphQL) {
         ExecutionResult r = graphQL.execute("query { E1 (id:1) { id }}");
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E1=[{id=1}]}");
+        assertEquals("{E1=[{id=1}]}", r.getData().toString());
 
         r = graphQL.execute("query { E1 (id:1) { id name}}");
-        assertEquals(r.getErrors().get(0).getErrorType(), ValidationError);
-        assertEquals(r.getErrors().get(0).getMessage(), "Validation error of type FieldUndefined: Field name is undefined");
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type FieldUndefined: Field name is undefined", r.getErrors().get(0).getMessage());
     }
 
     @Test
     public void includeEntityProperyClassTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .includeEntityProperty(E1.class, "id")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
@@ -240,12 +200,8 @@ public class GraphQLTest {
 
     @Test
     public void includeEntityProperyStringTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .includeEntityProperty("E1", "id")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
@@ -253,12 +209,8 @@ public class GraphQLTest {
 
     @Test
     public void excludeEntityProperyClassTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .excludeEntityProperty(E1.class, "name")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
@@ -266,12 +218,8 @@ public class GraphQLTest {
 
     @Test
     public void excludeEntityProperyStringTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .excludeEntityProperty("E1", "name")
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
                 .build();
 
         entityProperyTest(new GraphQL(schema));
@@ -279,11 +227,7 @@ public class GraphQLTest {
 
     @Test
     public void dataFetcherStringTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .dataFetcher("E1", DefaultDataFetcher.class)
                 .build();
 
@@ -292,16 +236,12 @@ public class GraphQLTest {
         ExecutionResult r = graphQL.execute("query { E1 { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E1=[{id=1, name=a}, {id=2, name=b}]}");
+        assertEquals("{E1=[{id=1, name=a}, {id=2, name=b}]}", r.getData().toString());
     }
 
     @Test
     public void dataFetcherClassTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .dataFetcher(E1.class, DefaultDataFetcher.class)
                 .build();
 
@@ -310,22 +250,18 @@ public class GraphQLTest {
         ExecutionResult r = graphQL.execute("query { E1 { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{E1=[{id=1, name=a}, {id=2, name=b}]}");
+        assertEquals("{E1=[{id=1, name=a}, {id=2, name=b}]}", r.getData().toString());
     }
 
     private void customQuery(GraphQL graphQL){
         ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{testE1=[{id=1, name=a}]}");
+        assertEquals("{testE1=[{id=1, name=a}]}", r.getData().toString());
     }
 
     @Test
     public void selectQueryTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
         Map<String, Object> params = new HashMap<>();
 
         params.put("id", 1);
@@ -333,30 +269,8 @@ public class GraphQLTest {
         Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
         SelectQuery<?> query = new SelectQuery<>("E1", expression);
 
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .query("testE1", query)
-                .build();
-
-        customQuery(new GraphQL(schema));
-    }
-
-    @Test
-    public void selectQueryDataFetcherTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
-        Map<String, Object> params = new HashMap<>();
-
-        params.put("id", 1);
-
-        Expression expression = ExpressionFactory.matchAllExp(params, Expression.EQUAL_TO);
-
-        SelectQuery<?> query = new SelectQuery<>("E1", expression);
-
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
-                .query("testE1", query)
-                .customQueryDataFetcher("testE1", CustomQueryDataFetcher.class)
                 .build();
 
         customQuery(new GraphQL(schema));
@@ -364,14 +278,9 @@ public class GraphQLTest {
 
     @Test
     public void selectQueryExpressionTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
-
         SelectQuery<?> query = new SelectQuery<>("E1", ExpressionFactory.exp("id = $id"));
 
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .query("testE1", query)
                 .build();
 
@@ -380,18 +289,14 @@ public class GraphQLTest {
         ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
+        assertEquals("{testE1=[{id=2, name=b}]}", r.getData().toString());
     }
 
     @Test
     public void objectSelectTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
         ObjectSelect query = ObjectSelect.query(E1.class).where(E1.ID.eq(2));
 
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .query("testE1", query)
                 .build();
 
@@ -400,18 +305,14 @@ public class GraphQLTest {
         ExecutionResult r = graphQL.execute("query { testE1 { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
+        assertEquals("{testE1=[{id=2, name=b}]}", r.getData().toString());
     }
 
     @Test
     public void objectSelectExpressionTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
         ObjectSelect query = ObjectSelect.query(E1.class).where(ExpressionFactory.exp("id = $id"));
 
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .query("testE1", query)
                 .build();
 
@@ -420,21 +321,17 @@ public class GraphQLTest {
         ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
+        assertEquals("{testE1=[{id=2, name=b}]}", r.getData().toString());
     }
 
     @Test
     public void sqlSelectExpressionTest() {
-        EntityBuilder entityBuilder = EntityBuilder
-                .builder(testFactory.getObjectContext())
-                .build();
-
         SQLSelect<?> query = SQLSelect.query(E1.class,
                 "SELECT * FROM utest.E1 WHERE ID = #bind($id)").columnNameCaps(CapsStrategy.LOWER);
 
         query.params("id", "$id");
 
-        GraphQLSchema schema = SchemaBuilder.builder(entityBuilder)
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .query("testE1", query)
                 .build();
 
@@ -443,6 +340,22 @@ public class GraphQLTest {
         ExecutionResult r = graphQL.execute("query { testE1 (id:2) { id name }}");
 
         LOGGER.info(r.getData().toString());
-        assertEquals(r.getData().toString(), "{testE1=[{id=2, name=b}]}");
+        assertEquals("{testE1=[{id=2, name=b}]}", r.getData().toString());
+    }
+
+    @Test
+    public void selectByIdTest() {
+        SelectById query = SelectById.query(E1.class, 2);
+
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
+                .query("testE1", query)
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { testE1 { id name }}");
+
+        LOGGER.info(r.getData().toString());
+        assertEquals("{testE1=[{id=2, name=b}]}", r.getData().toString());
     }
 }
