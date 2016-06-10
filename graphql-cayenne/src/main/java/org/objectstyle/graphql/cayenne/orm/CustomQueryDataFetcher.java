@@ -32,6 +32,7 @@ public class CustomQueryDataFetcher implements DataFetcher {
             }
         });
 
+        // TODO: think about universality
 
         if (query instanceof ObjectSelect) {
             Expression expression = ((ObjectSelect) query).getWhere();

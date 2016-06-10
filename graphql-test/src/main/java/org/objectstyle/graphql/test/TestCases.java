@@ -34,7 +34,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ allE1s(id:1) { id name }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{allE1s:[{id:1,name:a}]}}");
+        assertEquals("{data:{allE1s:[{id:1,name:a}]}}", r);
     }
 
     @Test
@@ -58,7 +58,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ allE2s(name:\"d\") { id name }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{allE2s:[{id:4,name:d}]}}");
+        assertEquals("{data:{allE2s:[{id:4,name:d}]}}", r);
     }
 
     @Test
@@ -66,7 +66,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E1 (id:2) { id name}}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E1:[{id:2,name:b}]}}");
+        assertEquals("{data:{E1:[{id:2,name:b}]}}", r);
     }
 
     @Test
@@ -74,7 +74,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E2 (id:3) { id name}}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E2:[{id:3,name:c}]}}");
+        assertEquals("{data:{E2:[{id:3,name:c}]}}", r);
     }
 
     @Test
@@ -90,7 +90,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E1 (id:2 name:\"b\") { id name e2s (id:4) {id name} }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E1:[{id:2,name:b,e2s:[{id:4,name:d}]}]}}");
+        assertEquals("{data:{E1:[{id:2,name:b,e2s:[{id:4,name:d}]}]}}", r);
     }
 
     @Test
@@ -98,7 +98,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E2 (id:3) { id name e1 {id name} }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E2:[{id:3,name:c,e1:{id:1,name:a}}]}}");
+        assertEquals("{data:{E2:[{id:3,name:c,e1:{id:1,name:a}}]}}", r);
     }
 
     @Test
@@ -106,7 +106,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{E2 (id:4) {id name e1 {id name e2s {id name e3s {id e2 {id name}} }}}}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E2:[{id:4,name:d,e1:{id:2,name:b,e2s:[{id:4,name:d,e3s:[{id:6,e2:{id:4,name:d}},{id:7,e2:{id:4,name:d}}]},{id:5,name:e,e3s:[{id:8,e2:{id:5,name:e}}]}]}}]}}");
+        assertEquals("{data:{E2:[{id:4,name:d,e1:{id:2,name:b,e2s:[{id:4,name:d,e3s:[{id:6,e2:{id:4,name:d}},{id:7,e2:{id:4,name:d}}]},{id:5,name:e,e3s:[{id:8,e2:{id:5,name:e}}]}]}}]}}", r);
     }
 
     @Test
@@ -114,7 +114,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E3 (id:6) { id name e2 {id name e1 {id name}} }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E3:[{id:6,name:f,e2:{id:4,name:d,e1:{id:2,name:b}}}]}}");
+        assertEquals("{data:{E3:[{id:6,name:f,e2:{id:4,name:d,e1:{id:2,name:b}}}]}}", r);
     }
 
     @Test
@@ -122,7 +122,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E1 (id:2 name:\"b\") { id name e2s {id name e3s {id name}} }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E1:[{id:2,name:b,e2s:[{id:4,name:d,e3s:[{id:6,name:f},{id:7,name:g}]},{id:5,name:e,e3s:[{id:8,name:h}]}]}]}}");
+        assertEquals("{data:{E1:[{id:2,name:b,e2s:[{id:4,name:d,e3s:[{id:6,name:f},{id:7,name:g}]},{id:5,name:e,e3s:[{id:8,name:h}]}]}]}}", r);
     }
 
     @Test
@@ -130,7 +130,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E1 (id:2 name:\"b\") { id name e4: e2s(id:4) {id name} }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E1:[{id:2,name:b,e4:[{id:4,name:d}]}]}}");
+        assertEquals("{data:{E1:[{id:2,name:b,e4:[{id:4,name:d}]}]}}", r);
     }
 
     @Test
@@ -138,7 +138,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{e1: E1(id:1) {id} e2: E1(id:2) {id}}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{e1:[{id:1}],e2:[{id:2}]}}");
+        assertEquals("{data:{e1:[{id:1}],e2:[{id:2}]}}", r);
     }
 
     @Test
@@ -146,7 +146,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ allE1s(_first:\"1\" _ascending:\"id\") { id name }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{allE1s:[{id:1,name:a}]}}");
+        assertEquals("{data:{allE1s:[{id:1,name:a}]}}", r);
     }
 
     @Test
@@ -154,7 +154,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ allE1s(_first:\"1\" _descending:[\"id\"]) { id name }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{allE1s:[{id:2,name:b}]}}");
+        assertEquals("{data:{allE1s:[{id:2,name:b}]}}", r);
     }
 
     @Test
@@ -162,7 +162,7 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E1 (id:2 name:\"b\") { id name e2s(_descending:[\"id\"]) {id name} }}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E1:[{id:2,name:b,e2s:[{id:5,name:e},{id:4,name:d}]}]}}");
+        assertEquals("{data:{E1:[{id:2,name:b,e2s:[{id:5,name:e},{id:4,name:d}]}]}}", r);
     }
 
     @Test
@@ -170,6 +170,6 @@ public abstract class TestCases {
         String r = postGraphqlRequest("{ E1 (id:2) { ...fragmentTest } } fragment fragmentTest on E1 {id name}");
 
         LOGGER.info(r);
-        assertEquals(r, "{data:{E1:[{id:2,name:b}]}}");
+        assertEquals("{data:{E1:[{id:2,name:b}]}}", r);
     }
 }
