@@ -5,48 +5,48 @@
 	 project-version="7">
 	<property name="defaultPackage" value="org.objectstyle.graphql.test.cayenne"/>
 	<property name="defaultSchema" value="utest"/>
-	<db-entity name="e1" schema="utest">
+	<db-entity name="E1" schema="utest">
 		<db-attribute name="id" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="name" type="VARCHAR" length="200"/>
 	</db-entity>
-	<db-entity name="e2" schema="utest">
+	<db-entity name="E2" schema="utest">
 		<db-attribute name="e1_id" type="BIGINT" isMandatory="true"/>
 		<db-attribute name="id" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="name" type="VARCHAR" length="200"/>
 	</db-entity>
-	<db-entity name="e3" schema="utest">
+	<db-entity name="E3" schema="utest">
 		<db-attribute name="e2_id" type="BIGINT" isMandatory="true"/>
 		<db-attribute name="id" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="name" type="VARCHAR" length="200"/>
 	</db-entity>
-	<obj-entity name="E1" className="org.objectstyle.graphql.test.cayenne.E1" dbEntityName="e1">
+	<obj-entity name="E1" className="org.objectstyle.graphql.test.cayenne.E1" dbEntityName="E1">
 		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
 	</obj-entity>
-	<obj-entity name="E2" className="org.objectstyle.graphql.test.cayenne.E2" dbEntityName="e2">
-		<obj-attribute name="e1_id" type="java.lang.Integer" db-attribute-path="e1.id"/>
+	<obj-entity name="E2" className="org.objectstyle.graphql.test.cayenne.E2" dbEntityName="E2">
+		<obj-attribute name="e1_id" type="java.lang.Integer" db-attribute-path="E1.id"/>
 		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
 	</obj-entity>
-	<obj-entity name="E3" className="org.objectstyle.graphql.test.cayenne.E3" dbEntityName="e3">
-		<obj-attribute name="e2_id" type="java.lang.Integer" db-attribute-path="e2.id"/>
+	<obj-entity name="E3" className="org.objectstyle.graphql.test.cayenne.E3" dbEntityName="E3">
+		<obj-attribute name="e2_id" type="java.lang.Integer" db-attribute-path="E2.id"/>
 		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
 	</obj-entity>
-	<db-relationship name="e2s" source="e1" target="e2" toMany="true">
+	<db-relationship name="e2s" source="E1" target="E2" toMany="true">
 		<db-attribute-pair source="id" target="e1_id"/>
 	</db-relationship>
-	<db-relationship name="e1" source="e2" target="e1" toMany="false">
+	<db-relationship name="E1" source="E2" target="E1" toMany="false">
 		<db-attribute-pair source="e1_id" target="id"/>
 	</db-relationship>
-	<db-relationship name="e3s" source="e2" target="e3" toMany="true">
+	<db-relationship name="e3s" source="E2" target="E3" toMany="true">
 		<db-attribute-pair source="id" target="e2_id"/>
 	</db-relationship>
-	<db-relationship name="e2" source="e3" target="e2" toMany="false">
+	<db-relationship name="E2" source="E3" target="E2" toMany="false">
 		<db-attribute-pair source="e2_id" target="id"/>
 	</db-relationship>
 	<obj-relationship name="e2s" source="E1" target="E2" deleteRule="Deny" db-relationship-path="e2s"/>
-	<obj-relationship name="e1" source="E2" target="E1" deleteRule="Nullify" db-relationship-path="e1"/>
+	<obj-relationship name="e1" source="E2" target="E1" deleteRule="Nullify" db-relationship-path="E1"/>
 	<obj-relationship name="e3s" source="E2" target="E3" deleteRule="Deny" db-relationship-path="e3s"/>
-	<obj-relationship name="e2" source="E3" target="E2" deleteRule="Nullify" db-relationship-path="e2"/>
+	<obj-relationship name="e2" source="E3" target="E2" deleteRule="Nullify" db-relationship-path="E2"/>
 </data-map>

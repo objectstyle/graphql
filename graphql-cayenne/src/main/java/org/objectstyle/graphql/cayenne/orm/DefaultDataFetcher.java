@@ -9,7 +9,6 @@ import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.query.Ordering;
-import org.apache.cayenne.query.Select;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.cayenne.query.SortOrder;
 
@@ -28,8 +27,8 @@ public class DefaultDataFetcher implements DataFetcher {
 	@Override
 	public Object get(DataFetchingEnvironment environment) {
 		DefaultFilters df = new DefaultFilters();
-		Map<String, Object> params = new HashMap<String, Object>();
-		Map<FilterType, Object> filters = new HashMap<FilterType, Object>();
+		Map<String, Object> params = new HashMap<>();
+		Map<FilterType, Object> filters = new HashMap<>();
 
         Object type = environment.getFieldType();
         String entityName;

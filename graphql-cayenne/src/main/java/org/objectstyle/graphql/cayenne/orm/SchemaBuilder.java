@@ -18,7 +18,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 public class SchemaBuilder {
     private ConcurrentMap<Class<?>, GraphQLScalarType> typeCache;
@@ -67,7 +66,7 @@ public class SchemaBuilder {
     }
 
     private DataFetcher getDataFetcher(String entity) {
-        DataFetcher df = null;
+        DataFetcher df;
 
         try {
             if (dataFetchers.containsKey(entity)) {
@@ -101,18 +100,8 @@ public class SchemaBuilder {
 
             argList.addAll(createDefaultFilters());
 
-            // ... create select operations for all entities
-            GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
-                    .name("all" + et.getName() + "s")
-                    .type(new GraphQLList(et))
-                    .argument(argList)
-                    .dataFetcher(getDataFetcher("all" + et.getName() + "s"))
-                    .build();
-
-            typeBuilder.field(f);
-
             // ... create search by field operations for all entities
-            f = GraphQLFieldDefinition.newFieldDefinition()
+            GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
                     .name(et.getName())
                     .type(new GraphQLList(et))
                     .argument(argList)
@@ -231,7 +220,7 @@ public class SchemaBuilder {
 
                 GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
                         .name(or.getName())
-                        .argument(argList.stream().distinct().collect(Collectors.toList()))
+                        .argument(or.isToMany() ? argList : new ArrayList<>())
                         .type(or.isToMany() ? new GraphQLList(new GraphQLTypeReference(or.getTargetEntityName())) : new GraphQLTypeReference(or.getTargetEntityName()))
                         .dataFetcher(getDataFetcher(or.getName()))
                         .build();

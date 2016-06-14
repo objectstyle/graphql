@@ -10,9 +10,7 @@ import org.apache.cayenne.query.*;
 
 import org.junit.Test;
 
-import org.objectstyle.graphql.cayenne.orm.CustomQueryDataFetcher;
 import org.objectstyle.graphql.cayenne.orm.DefaultDataFetcher;
-import org.objectstyle.graphql.cayenne.orm.EntityBuilder;
 import org.objectstyle.graphql.cayenne.orm.SchemaBuilder;
 
 import org.objectstyle.graphql.test.TestFactory;

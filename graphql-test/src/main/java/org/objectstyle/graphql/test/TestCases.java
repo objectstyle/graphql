@@ -23,42 +23,26 @@ public abstract class TestCases {
 
     @Test
     public void testQueryAllE1() {
-        String r = postGraphqlRequest("{ allE1s { id name }}");
+        String r = postGraphqlRequest("{ E1 { id name }}");
 
         LOGGER.info(r);
-        assertTrue(r, r.startsWith("{data:{allE1s:[{id:"));
-    }
-
-    @Test
-    public void testQueryAllE1WithArguments() {
-        String r = postGraphqlRequest("{ allE1s(id:1) { id name }}");
-
-        LOGGER.info(r);
-        assertEquals("{data:{allE1s:[{id:1,name:a}]}}", r);
+        assertTrue(r, r.startsWith("{data:{E1:[{id:"));
     }
 
     @Test
     public void testQueryAllE2() throws InterruptedException {
-        String r = postGraphqlRequest("{ allE2s { id name }}");
+        String r = postGraphqlRequest("{ E2 { id name }}");
 
         LOGGER.info(r);
-        assertTrue(r, r.startsWith("{data:{allE2s:[{id:"));
+        assertTrue(r, r.startsWith("{data:{E2:[{id:"));
     }
 
     @Test
     public void testQueryAllE3() throws InterruptedException {
-        String r = postGraphqlRequest("{ allE3s { id name }}");
+        String r = postGraphqlRequest("{ E3 { id name }}");
 
         LOGGER.info(r);
-        assertTrue(r, r.startsWith("{data:{allE3s:[{id:"));
-    }
-
-    @Test
-    public void testQueryAllE2WithArguments() {
-        String r = postGraphqlRequest("{ allE2s(name:\"d\") { id name }}");
-
-        LOGGER.info(r);
-        assertEquals("{data:{allE2s:[{id:4,name:d}]}}", r);
+        assertTrue(r, r.startsWith("{data:{E3:[{id:"));
     }
 
     @Test
@@ -143,18 +127,18 @@ public abstract class TestCases {
 
     @Test
     public void testQueryFiltersAscending() {
-        String r = postGraphqlRequest("{ allE1s(_first:\"1\" _ascending:\"id\") { id name }}");
+        String r = postGraphqlRequest("{ E1(_first:\"1\" _ascending:\"id\") { id name }}");
 
         LOGGER.info(r);
-        assertEquals("{data:{allE1s:[{id:1,name:a}]}}", r);
+        assertEquals("{data:{E1:[{id:1,name:a}]}}", r);
     }
 
     @Test
     public void testQueryFiltersDescending_1() {
-        String r = postGraphqlRequest("{ allE1s(_first:\"1\" _descending:[\"id\"]) { id name }}");
+        String r = postGraphqlRequest("{ E1(_first:\"1\" _descending:[\"id\"]) { id name }}");
 
         LOGGER.info(r);
-        assertEquals("{data:{allE1s:[{id:2,name:b}]}}", r);
+        assertEquals("{data:{E1:[{id:2,name:b}]}}", r);
     }
 
     @Test
