@@ -356,4 +356,69 @@ public class GraphQLTest {
         LOGGER.info(r.getData().toString());
         assertEquals("{testE1=[{id=2, name=b}]}", r.getData().toString());
     }
+
+
+    @Test
+    public void mutationUpdateTest() {
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("mutation  { updateE1(id:1 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{updateE1=[{id=1, name=bb}]}", r.getData().toString());
+
+        r = graphQL.execute("query  { E1(id:1 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{E1=[{id=1, name=bb}]}", r.getData().toString());
+
+        r = graphQL.execute("mutation  { updateE1(id:1 name:\"a\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{updateE1=[{id=1, name=a}]}", r.getData().toString());
+
+        r = graphQL.execute("query  { E1(id:1 name:\"a\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{E1=[{id=1, name=a}]}", r.getData().toString());
+    }
+
+    @Test
+    public void mutationAddTest() {
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("mutation  { updateE1(id:331 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{updateE1=[{id=331, name=bb}]}", r.getData().toString());
+
+        r = graphQL.execute("query  { E1(id:331 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{E1=[{id=331, name=bb}]}", r.getData().toString());
+    }
+
+    @Test
+    public void mutationDeleteTest() {
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("mutation  { updateE1(id:331 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{updateE1=[{id=331, name=bb}]}", r.getData().toString());
+
+        r = graphQL.execute("query  { E1(id:331 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{E1=[{id=331, name=bb}]}", r.getData().toString());
+
+        r = graphQL.execute("mutation  { deleteE1(id:331 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{deleteE1=[{id=331, name=bb}]}", r.getData().toString());
+
+        r = graphQL.execute("query  { E1(id:331 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{E1=[]}", r.getData().toString());
+    }
 }

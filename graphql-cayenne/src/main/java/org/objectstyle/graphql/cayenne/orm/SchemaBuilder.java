@@ -2,6 +2,7 @@ package org.objectstyle.graphql.cayenne.orm;
 
 import graphql.Scalars;
 import graphql.schema.*;
+
 import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
@@ -58,9 +59,11 @@ public class SchemaBuilder {
         typeCache.put(BigDecimal.class, Scalars.GraphQLFloat);
 
         Set entityTypes = entityTypes();
-        GraphQLObjectType rootQueryType = queryType(entityTypes);
+        GraphQLObjectType queryType = queryType(entityTypes);
 
-        graphQLSchema = GraphQLSchema.newSchema().query(rootQueryType).build(entityTypes);
+        GraphQLObjectType mutationType = mutationType(entityTypes);
+
+        graphQLSchema = GraphQLSchema.newSchema().query(queryType).mutation(mutationType).build(entityTypes);
 
         return this;
     }
@@ -82,7 +85,7 @@ public class SchemaBuilder {
     }
 
     private GraphQLObjectType queryType(Set<GraphQLObjectType> entityTypes) {
-        GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name("root");
+        GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name("queryType");
 
         // naive... root type should be a user-visible builder
         entityTypes.forEach(et -> {
@@ -180,6 +183,44 @@ public class SchemaBuilder {
 
                 typeBuilder.field(f);
             }
+        });
+
+        return typeBuilder.build();
+    }
+
+    private GraphQLObjectType mutationType(Set<GraphQLObjectType> entityTypes) {
+        GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name("mutationType");
+
+        entityTypes.forEach(et -> {
+            List<GraphQLArgument> argList = new ArrayList<>();
+
+            et.getFieldDefinitions().forEach(fd -> {
+                if (fd.getType() instanceof GraphQLScalarType) {
+                    argList.add(GraphQLArgument
+                            .newArgument()
+                            .name(fd.getName())
+                            .type((GraphQLInputType) fd.getType())
+                            .build());
+                }
+            });
+
+            GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
+                    .name("update" + et.getName())
+                    .type(new GraphQLList(et))
+                    .argument(argList)
+                    .dataFetcher(new UpdateDataFetcher(objectContext))
+                    .build();
+
+            typeBuilder.field(f);
+
+            f = GraphQLFieldDefinition.newFieldDefinition()
+                    .name("delete" + et.getName())
+                    .type(new GraphQLList(et))
+                    .argument(argList)
+                    .dataFetcher(new DeleteDataFetcher(objectContext))
+                    .build();
+
+            typeBuilder.field(f);
         });
 
         return typeBuilder.build();
