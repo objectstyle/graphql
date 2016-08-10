@@ -1,7 +1,9 @@
 package org.objectstyle.graphql.bootique;
 
 import com.google.inject.*;
-import com.nhl.bootique.jersey.JerseyModule;
+import io.bootique.jersey.JerseyModule;
+import io.bootique.ConfigModule;
+
 import org.apache.cayenne.configuration.server.ServerRuntime;
 
 import org.objectstyle.graphql.rest.json.JacksonReaderWriter;
@@ -9,8 +11,6 @@ import org.objectstyle.graphql.rest.json.JsonReader;
 import org.objectstyle.graphql.rest.json.JsonWriter;
 import org.objectstyle.graphql.cayenne.orm.DefaultSchemaTranslator;
 import org.objectstyle.graphql.cayenne.orm.SchemaTranslator;
-
-import com.nhl.bootique.ConfigModule;
 
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;

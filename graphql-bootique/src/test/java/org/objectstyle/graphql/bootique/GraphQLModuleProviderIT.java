@@ -8,7 +8,7 @@ import java.util.stream.StreamSupport;
 
 import org.junit.Test;
 
-import com.nhl.bootique.BQModuleProvider;
+import io.bootique.BQModuleProvider;
 
 public class GraphQLModuleProviderIT {
 

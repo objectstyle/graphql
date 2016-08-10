@@ -1,9 +1,9 @@
 package org.objectstyle.graphql.webconsole;
 
 import com.google.inject.Binder;
-import com.nhl.bootique.BQCoreModule;
-import com.nhl.bootique.ConfigModule;
-import com.nhl.bootique.jetty.JettyModule;
+import io.bootique.BQCoreModule;
+import io.bootique.ConfigModule;
+import io.bootique.jetty.JettyModule;
 
 public class WebConsoleModule extends ConfigModule {
 

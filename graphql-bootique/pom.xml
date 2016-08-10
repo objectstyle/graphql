@@ -21,21 +21,21 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.nhl.bootique</groupId>
+			<groupId>io.bootique</groupId>
 			<artifactId>bootique</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.nhl.bootique.cayenne</groupId>
+			<groupId>io.bootique.cayenne</groupId>
 			<artifactId>bootique-cayenne</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.nhl.bootique.jersey</groupId>
+			<groupId>io.bootique.jersey</groupId>
 			<artifactId>bootique-jersey</artifactId>
 		</dependency>
 
 		<!-- Test deps -->
 		<dependency>
-			<groupId>com.nhl.bootique</groupId>
+			<groupId>io.bootique</groupId>
 			<artifactId>bootique-test</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -56,7 +56,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.nhl.bootique.jetty</groupId>
+			<groupId>io.bootique.jetty</groupId>
 			<artifactId>bootique-jetty-test</artifactId>
 			<scope>test</scope>
 		</dependency>

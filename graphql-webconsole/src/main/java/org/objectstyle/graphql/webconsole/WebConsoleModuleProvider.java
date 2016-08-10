@@ -1,7 +1,7 @@
 package org.objectstyle.graphql.webconsole;
 
 import com.google.inject.Module;
-import com.nhl.bootique.BQModuleProvider;
+import io.bootique.BQModuleProvider;
 
 public class WebConsoleModuleProvider implements BQModuleProvider {
 

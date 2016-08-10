@@ -7,12 +7,12 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.nhl.bootique.jersey.JerseyModule;
+import io.bootique.jersey.JerseyModule;
+import io.bootique.jetty.test.junit.JettyTestFactory;
+import io.bootique.Bootique;
 
-import com.nhl.bootique.jetty.test.junit.JettyTestFactory;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 
-import com.nhl.bootique.Bootique;
 
 import org.objectstyle.graphql.test.TestFactory;
 import org.slf4j.Logger;

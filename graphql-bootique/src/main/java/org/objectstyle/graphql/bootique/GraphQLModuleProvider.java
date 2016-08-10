@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.google.inject.Module;
-import com.nhl.bootique.BQModuleProvider;
-import com.nhl.bootique.jersey.JerseyModule;
+import io.bootique.BQModuleProvider;
+import io.bootique.jersey.JerseyModule;
 
 public class GraphQLModuleProvider implements BQModuleProvider {
 
