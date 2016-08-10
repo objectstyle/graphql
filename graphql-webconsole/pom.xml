@@ -20,5 +20,17 @@
 			<artifactId>bootique-jetty</artifactId>
 			<scope>compile</scope>
 		</dependency>
+
+		<!-- Test deps -->
+		<dependency>
+			<groupId>io.bootique</groupId>
+			<artifactId>bootique-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
