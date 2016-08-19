@@ -3,7 +3,6 @@ package org.objectstyle.graphql.cayenne.orm;
 import graphql.Scalars;
 import graphql.schema.*;
 
-import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.parser.ASTObjPath;
@@ -24,15 +23,10 @@ public class SchemaBuilder {
     private ConcurrentMap<Class<?>, GraphQLScalarType> typeCache;
     private GraphQLSchema graphQLSchema;
     private ObjectContext objectContext;
+    private QueryType queryType = null;
+    private MutationType mutationType = null;
 
-    private Map<String, Class<? extends DataFetcher>> dataFetchers = new HashMap<>();
-
-    private EntityBuilder entityBuilder;
-
-    private Map<String, Select<?>> queries = new HashMap<>();
-
-    private SchemaBuilder() {
-    }
+    private Map<String, Class<? extends DataFetcher>> dataFetchers = null;
 
     private SchemaBuilder initialize() {
         this.typeCache = new ConcurrentHashMap<>();
@@ -58,12 +52,23 @@ public class SchemaBuilder {
         typeCache.put(Double.TYPE, Scalars.GraphQLFloat);
         typeCache.put(BigDecimal.class, Scalars.GraphQLFloat);
 
-        Set entityTypes = entityTypes();
-        GraphQLObjectType queryType = queryType(entityTypes);
+        if(queryType == null) {
+            queryType = QueryType.builder(objectContext).build();
+        }
 
-        GraphQLObjectType mutationType = mutationType(entityTypes);
+        dataFetchers = queryType.getDataFetchers();
 
-        graphQLSchema = GraphQLSchema.newSchema().query(queryType).mutation(mutationType).build(entityTypes);
+        Set queryTypes = entityTypes(queryType);
+
+        GraphQLSchema.Builder graphQLSchemaBuilder = GraphQLSchema.newSchema().query(queryType(queryTypes));
+
+        if(mutationType != null) {
+            Set mutationTypes = entityTypes(mutationType);
+
+            graphQLSchemaBuilder.mutation(mutationType(mutationTypes));
+        }
+
+        graphQLSchema = graphQLSchemaBuilder.build();
 
         return this;
     }
@@ -114,7 +119,7 @@ public class SchemaBuilder {
             typeBuilder.field(f);
         });
 
-        queries.forEach((k, v) -> {
+        queryType.getQueries().forEach((k, v) -> {
             GraphQLObjectType ot = null;
 
             ObjEntity oe = v.getMetaData(objectContext.getEntityResolver()).getObjEntity();
@@ -226,11 +231,10 @@ public class SchemaBuilder {
         return typeBuilder.build();
     }
 
-    private Set<GraphQLObjectType> entityTypes() {
-
+    private Set<GraphQLObjectType> entityTypes(BaseType baseType) {
         Set<GraphQLObjectType> types = new HashSet<>();
 
-        for (Entity oe : entityBuilder.getEntities()) {
+        for (Entity oe : baseType.getEntityBuilder().getEntities()) {
             GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name(oe.getObjEntity().getName());
 
             // add attributes
@@ -247,7 +251,7 @@ public class SchemaBuilder {
             for (ObjRelationship or : oe.getRelationships()) {
                 List<GraphQLArgument> argList = new ArrayList<>();
 
-                Entity e = entityBuilder.getEntityByName(or.getTargetEntityName());
+                Entity e = baseType.getEntityBuilder().getEntityByName(or.getTargetEntityName());
 
                 if (e != null) {
                     e.getAttributes().forEach(tea -> argList.add(GraphQLArgument
@@ -305,81 +309,23 @@ public class SchemaBuilder {
 
     public static class Builder {
         private SchemaBuilder schemaBuilder;
-        private EntityBuilder.Builder entityBuilder;
 
         private Builder(ObjectContext objectContext) {
             this.schemaBuilder = new SchemaBuilder();
             this.schemaBuilder.objectContext = objectContext;
-
-            this.entityBuilder = EntityBuilder.builder(objectContext);
         }
 
-        private ObjEntity getObjEntityByClass(Class<? extends CayenneDataObject> entity) {
-            return this.schemaBuilder.objectContext.getEntityResolver().getObjEntity(((Class) entity).getSimpleName());
-        }
-
-        public Builder dataFetcher(String entity, Class<? extends DataFetcher> dataFetcher) {
-            schemaBuilder.dataFetchers.put(entity, dataFetcher);
+        public Builder queryType(QueryType queryType) {
+            this.schemaBuilder.queryType = queryType;
             return this;
         }
 
-        public Builder dataFetcher(Class<? extends CayenneDataObject> entity, Class<? extends DataFetcher> dataFetcher) {
-            ObjEntity oe = getObjEntityByClass(entity);
-            if (oe != null) {
-                return dataFetcher(oe.getName(), dataFetcher);
-            }
-            return this;
-        }
-
-        public Builder query(String propertyName, Select<?> query) {
-            schemaBuilder.queries.put(propertyName, query);
-            return this;
-        }
-
-        public Builder includeEntities(String... entities) {
-            this.entityBuilder.includeEntities(entities);
-            return this;
-        }
-
-        @SafeVarargs
-        public final Builder includeEntities(Class<? extends CayenneDataObject>... entities) {
-            this.entityBuilder.includeEntities(entities);
-            return this;
-        }
-
-        public Builder excludeEntities(String... entities) {
-            this.entityBuilder.excludeEntities(entities);
-            return this;
-        }
-
-        @SafeVarargs
-        public final Builder excludeEntities(Class<? extends CayenneDataObject>... entities) {
-            this.entityBuilder.excludeEntities(entities);
-            return this;
-        }
-
-        public Builder includeEntityProperty(Class<? extends CayenneDataObject> entity, String... properties) {
-            this.entityBuilder.includeEntityProperty(entity, properties);
-            return this;
-        }
-
-        public Builder includeEntityProperty(String entity, String... properties) {
-            this.entityBuilder.includeEntityProperty(entity, properties);
-            return this;
-        }
-
-        public Builder excludeEntityProperty(Class<? extends CayenneDataObject> entity, String... properties) {
-            this.entityBuilder.excludeEntityProperty(entity, properties);
-            return this;
-        }
-
-        public Builder excludeEntityProperty(String entity, String... properties) {
-            this.entityBuilder.excludeEntityProperty(entity, properties);
+        public Builder mutationType(MutationType mutationType) {
+            this.schemaBuilder.mutationType = mutationType;
             return this;
         }
 
         public GraphQLSchema build() {
-            this.schemaBuilder.entityBuilder = this.entityBuilder.build();
             return schemaBuilder.initialize().getGraphQLSchema();
         }
     }
