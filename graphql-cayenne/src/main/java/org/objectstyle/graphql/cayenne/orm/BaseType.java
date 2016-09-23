@@ -27,45 +27,34 @@ public class BaseType {
             this.entityBuilder = EntityBuilder.builder(objectContext);
         }
 
-        public Builder includeEntities(String... entities) {
-            this.entityBuilder.includeEntities(entities);
+        public Builder configureEntities(EntityBuilder.ConfigureType type, String... entities) {
+            this.entityBuilder.configureEntities(type, entities);
             return this;
         }
 
         @SafeVarargs
-        public final Builder includeEntities(Class<? extends CayenneDataObject>... entities) {
-            this.entityBuilder.includeEntities(entities);
+        public final Builder configureEntities(EntityBuilder.ConfigureType type, Class<? extends CayenneDataObject>... entities) {
+            this.entityBuilder.configureEntities(type, entities);
             return this;
         }
 
-        public Builder excludeEntities(String... entities) {
-            this.entityBuilder.excludeEntities(entities);
+        public Builder configureProperties(EntityBuilder.ConfigureType type, Class<? extends CayenneDataObject> entity, String... properties) {
+            this.entityBuilder.configureProperties(type, entity, properties);
             return this;
         }
 
-        @SafeVarargs
-        public final Builder excludeEntities(Class<? extends CayenneDataObject>... entities) {
-            this.entityBuilder.excludeEntities(entities);
+        public Builder configureProperties(EntityBuilder.ConfigureType type, String entity, String... properties) {
+            this.entityBuilder.configureProperties(type, entity, properties);
             return this;
         }
 
-        public Builder includeEntityProperty(Class<? extends CayenneDataObject> entity, String... properties) {
-            this.entityBuilder.includeEntityProperty(entity, properties);
+        public Builder configureArguments(EntityBuilder.ConfigureType type, Class<? extends CayenneDataObject> entity, String... arguments) {
+            this.entityBuilder.configureArguments(type, entity, arguments);
             return this;
         }
 
-        public Builder includeEntityProperty(String entity, String... properties) {
-            this.entityBuilder.includeEntityProperty(entity, properties);
-            return this;
-        }
-
-        public Builder excludeEntityProperty(Class<? extends CayenneDataObject> entity, String... properties) {
-            this.entityBuilder.excludeEntityProperty(entity, properties);
-            return this;
-        }
-
-        public Builder excludeEntityProperty(String entity, String... properties) {
-            this.entityBuilder.excludeEntityProperty(entity, properties);
+        public Builder configureArguments(EntityBuilder.ConfigureType type, String entity, String... arguments) {
+            this.entityBuilder.configureArguments(type, entity, arguments);
             return this;
         }
 

@@ -11,6 +11,7 @@ class Entity {
     private ObjEntity objEntity;
     private Collection<ObjAttribute> attributes = new ArrayList<>();
     private Collection<ObjRelationship> relationships = new ArrayList<>();
+    private Collection<String> arguments = new ArrayList<>();
 
     Entity(ObjEntity objEntity) {
         this.objEntity = objEntity;
@@ -34,5 +35,13 @@ class Entity {
 
     void addRelationships(Collection<ObjRelationship> relationships) {
         this.relationships.addAll(relationships);
+    }
+
+    void addArgument(String arg){
+        arguments.add(arg);
+    }
+
+    Collection<String> getArguments(){
+        return arguments;
     }
 }

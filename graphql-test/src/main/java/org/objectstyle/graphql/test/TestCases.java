@@ -9,9 +9,10 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class TestCases {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestCases.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(TestCases.class);
 
-    protected abstract String postGraphqlRequest(String request);
+    protected abstract String postGraphqlRequest(String query);
+    protected abstract String postGraphqlRequest(String query, String variables);
 
     @Test
     public void testSchemaQuery() {
@@ -155,5 +156,45 @@ public abstract class TestCases {
 
         LOGGER.info(r);
         assertEquals("{data:{E1:[{id:2,name:b}]}}", r);
+    }
+
+    @Test
+    public void testQueryWithVariables() {
+        String r = postGraphqlRequest("($id: Int!) { E1(id:$id) { id name }}", "{\"id\":1}");
+
+        LOGGER.info(r);
+        assertTrue(r, r.startsWith("{data:{E1:[{id:1,name:a}]}}"));
+    }
+
+    @Test
+    public void testQueryWithIncludeDirectiveFalse() {
+        String r = postGraphqlRequest("($includeE2s: Boolean!) { E1(id: 1) {id e2s @include(if: $includeE2s) { name }}}", "{\"includeE2s\":false}");
+
+        LOGGER.info(r);
+        assertTrue(r, r.startsWith("{data:{E1:[{id:1}]}}"));
+    }
+
+    @Test
+    public void testQueryWithIncludeDirectiveTrue() {
+        String r = postGraphqlRequest("($includeE2s: Boolean!) { E1(id: 1) {id e2s @include(if: $includeE2s) { name }}}", "{\"includeE2s\":true}");
+
+        LOGGER.info(r);
+        assertTrue(r, r.startsWith("{data:{E1:[{id:1,e2s:[{name:c}]}]}}"));
+    }
+
+    @Test
+    public void testQueryWithSkipDirectiveFalse() {
+        String r = postGraphqlRequest("($skipE2s: Boolean!) { E1(id: 1) {id e2s @skip(if: $skipE2s) { name }}}", "{\"skipE2s\":false}");
+
+        LOGGER.info(r);
+        assertTrue(r, r.startsWith("{data:{E1:[{id:1,e2s:[{name:c}]}]}}"));
+    }
+
+    @Test
+    public void testQueryWithSkipDirectiveTrue() {
+        String r = postGraphqlRequest("($skipE2s: Boolean!) { E1(id: 1) {id e2s @skip(if: $skipE2s) { name }}}", "{\"skipE2s\":true}");
+
+        LOGGER.info(r);
+        assertTrue(r, r.startsWith("{data:{E1:[{id:1}]}}"));
     }
 }

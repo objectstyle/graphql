@@ -9,9 +9,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * A REST resource exposing the GraphQL engine.
@@ -31,6 +34,18 @@ public class GraphQLResource {
         }
 
         GraphQL graphql = (GraphQL) config.getProperty(GraphQL.class.getName());
+
+        if(queryHolder.getVariables() != null) {
+            HashMap variables = new HashMap<>();
+
+            try {
+                variables = new ObjectMapper().readValue(queryHolder.getVariables(), HashMap.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return graphql.execute(queryHolder.getQuery(), (Object)null, variables);
+        }
 
         return graphql.execute(queryHolder.getQuery());
     }

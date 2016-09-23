@@ -92,21 +92,27 @@ public class SchemaBuilder {
     private GraphQLObjectType queryType(Set<GraphQLObjectType> entityTypes) {
         GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name("queryType");
 
+        EntityBuilder entityBuilder =  queryType.getEntityBuilder();
+
         // naive... root type should be a user-visible builder
         entityTypes.forEach(et -> {
             List<GraphQLArgument> argList = new ArrayList<>();
 
+            Entity e = entityBuilder.getEntityByName(et.getName());
+
             et.getFieldDefinitions().forEach(fd -> {
                 if (fd.getType() instanceof GraphQLScalarType) {
-                    argList.add(GraphQLArgument
-                            .newArgument()
-                            .name(fd.getName())
-                            .type((GraphQLInputType) fd.getType())
-                            .build());
+                    if(e.getArguments().contains(fd.getName())) {
+                        argList.add(GraphQLArgument
+                                .newArgument()
+                                .name(fd.getName())
+                                .type((GraphQLInputType) fd.getType())
+                                .build());
+                    }
                 }
             });
 
-            argList.addAll(createDefaultFilters());
+            argList.addAll(addAdditionalArguments());
 
             // ... create search by field operations for all entities
             GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
@@ -196,16 +202,22 @@ public class SchemaBuilder {
     private GraphQLObjectType mutationType(Set<GraphQLObjectType> entityTypes) {
         GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name("mutationType");
 
+        EntityBuilder entityBuilder =  mutationType.getEntityBuilder();
+
         entityTypes.forEach(et -> {
             List<GraphQLArgument> argList = new ArrayList<>();
 
+            Entity e = entityBuilder.getEntityByName(et.getName());
+
             et.getFieldDefinitions().forEach(fd -> {
                 if (fd.getType() instanceof GraphQLScalarType) {
-                    argList.add(GraphQLArgument
-                            .newArgument()
-                            .name(fd.getName())
-                            .type((GraphQLInputType) fd.getType())
-                            .build());
+                    if(e.getArguments().contains(fd.getName())) {
+                        argList.add(GraphQLArgument
+                                .newArgument()
+                                .name(fd.getName())
+                                .type((GraphQLInputType) fd.getType())
+                                .build());
+                    }
                 }
             });
 
@@ -234,7 +246,9 @@ public class SchemaBuilder {
     private Set<GraphQLObjectType> entityTypes(BaseType baseType) {
         Set<GraphQLObjectType> types = new HashSet<>();
 
-        for (Entity oe : baseType.getEntityBuilder().getEntities()) {
+        EntityBuilder entityBuilder =  baseType.getEntityBuilder();
+
+        for (Entity oe : entityBuilder.getEntities()) {
             GraphQLObjectType.Builder typeBuilder = GraphQLObjectType.newObject().name(oe.getObjEntity().getName());
 
             // add attributes
@@ -251,16 +265,20 @@ public class SchemaBuilder {
             for (ObjRelationship or : oe.getRelationships()) {
                 List<GraphQLArgument> argList = new ArrayList<>();
 
-                Entity e = baseType.getEntityBuilder().getEntityByName(or.getTargetEntityName());
+                Entity e = entityBuilder.getEntityByName(or.getTargetEntityName());
 
                 if (e != null) {
-                    e.getAttributes().forEach(tea -> argList.add(GraphQLArgument
-                            .newArgument()
-                            .name(tea.getName())
-                            .type(mapType(tea.getJavaClass()))
-                            .build()));
+                    e.getAttributes().forEach(tea -> {
+                        if(e.getArguments().contains(tea.getName())) {
+                            argList.add(GraphQLArgument
+                                    .newArgument()
+                                    .name(tea.getName())
+                                    .type(mapType(tea.getJavaClass()))
+                                    .build());
+                        }
+                    });
 
-                    argList.addAll(createDefaultFilters());
+                    argList.addAll(addAdditionalArguments());
                 }
 
                 GraphQLFieldDefinition f = GraphQLFieldDefinition.newFieldDefinition()
@@ -291,6 +309,27 @@ public class SchemaBuilder {
                         .build());
             }
         });
+
+        return argList;
+    }
+
+    private List<GraphQLArgument> createDirectivesArguments() {
+        List<GraphQLArgument> argList = new ArrayList<>();
+
+        argList.add(GraphQLArgument
+                .newArgument()
+                .name("if")
+                .type(Scalars.GraphQLBoolean)
+                .build());
+
+        return argList;
+    }
+
+    private List<GraphQLArgument> addAdditionalArguments() {
+        List<GraphQLArgument> argList = new ArrayList<>();
+
+        argList.addAll(createDefaultFilters());
+        argList.addAll(createDirectivesArguments());
 
         return argList;
     }

@@ -51,7 +51,7 @@ public class GraphQLTest {
     public void incudeOneEntityClassTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.includeEntities(E1.class);
+        queryType.configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, E1.class);
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -63,7 +63,7 @@ public class GraphQLTest {
     @Test
     public void incudeOneEntityStringTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
-        queryType.includeEntities("E1").build();
+        queryType.configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, "E1");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -91,7 +91,9 @@ public class GraphQLTest {
     public void incudeAllEntitiesClassTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.includeEntities(E1.class).includeEntities(E2.class).includeEntities(E3.class);
+        queryType.configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, E1.class)
+                .configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, E2.class)
+                .configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, E3.class);
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -105,7 +107,9 @@ public class GraphQLTest {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
 
-        queryType.includeEntities("E1").includeEntities("E2").includeEntities("E3");
+        queryType.configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, "E1")
+                .configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, "E2")
+                .configureEntities(EntityBuilder.ConfigureType.INCLUDE_OBJECT, "E3");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -134,7 +138,7 @@ public class GraphQLTest {
     public void excludeOneEntityClassTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.excludeEntities(E2.class);
+        queryType.configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, E2.class);
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -147,7 +151,7 @@ public class GraphQLTest {
     public void excludeOneEntityStringTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.excludeEntities("E2");
+        queryType.configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, "E2");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -178,7 +182,9 @@ public class GraphQLTest {
     public void excludeAllEntitiesClassTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.excludeEntities(E1.class).excludeEntities(E2.class).excludeEntities(E3.class);
+        queryType.configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, E1.class)
+                .configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, E2.class)
+                .configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, E3.class);
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -191,7 +197,9 @@ public class GraphQLTest {
     public void excludeAllEntitiesStringTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.excludeEntities("E1").excludeEntities("E2").excludeEntities("E3");
+        queryType.configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, "E1")
+                .configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, "E2")
+                .configureEntities(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, "E3");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -214,7 +222,7 @@ public class GraphQLTest {
     public void includeEntityProperyClassTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.includeEntityProperty(E1.class, "id");
+        queryType.configureProperties(EntityBuilder.ConfigureType.INCLUDE_OBJECT, E1.class, "id");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -227,7 +235,7 @@ public class GraphQLTest {
     public void includeEntityProperyStringTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.includeEntityProperty("E1", "id");
+        queryType.configureProperties(EntityBuilder.ConfigureType.INCLUDE_OBJECT, "E1", "id");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -240,7 +248,7 @@ public class GraphQLTest {
     public void excludeEntityProperyClassTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.excludeEntityProperty(E1.class, "name");
+        queryType.configureProperties(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, E1.class, "name");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -253,7 +261,7 @@ public class GraphQLTest {
     public void excludeEntityProperyStringTest() {
         QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
 
-        queryType.excludeEntityProperty("E1", "name");
+        queryType.configureProperties(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, "E1", "name");
 
         GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
                 .queryType(queryType.build())
@@ -463,6 +471,10 @@ public class GraphQLTest {
         r = graphQL.execute("query  { E1(id:331 name:\"bb\") {id name} }}");
         LOGGER.info(r.getData().toString());
         assertEquals("{E1=[{id=331, name=bb}]}", r.getData().toString());
+
+        r = graphQL.execute("mutation  { deleteE1(id:331 name:\"bb\") {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{deleteE1=[{id=331, name=bb}]}", r.getData().toString());
     }
 
     @Test
@@ -489,5 +501,89 @@ public class GraphQLTest {
         r = graphQL.execute("query  { E1(id:331 name:\"bb\") {id name} }}");
         LOGGER.info(r.getData().toString());
         assertEquals("{E1=[]}", r.getData().toString());
+    }
+
+    @Test
+    public void mutationIncludePropertyTest() {
+        MutationType.Builder mutationType = MutationType.builder(testFactory.getObjectContext());
+
+        mutationType.configureProperties(EntityBuilder.ConfigureType.INCLUDE_OBJECT, "E1", "id");
+
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext()).mutationType(mutationType.build())
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("mutation  { updateE1(id:331) {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{updateE1=[{id=331, name=null}]}", r.getData().toString());
+
+        r = graphQL.execute("mutation  { deleteE1(id:331) {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{deleteE1=[{id=331, name=null}]}", r.getData().toString());
+    }
+
+    @Test
+    public void mutationExcludePropertyTest() {
+        MutationType.Builder mutationType = MutationType.builder(testFactory.getObjectContext());
+
+        mutationType.configureProperties(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, "E1", "name");
+
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext()).mutationType(mutationType.build())
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("mutation  { updateE1(id:331) {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{updateE1=[{id=331, name=null}]}", r.getData().toString());
+
+        r = graphQL.execute("mutation  { deleteE1(id:331) {id name} }}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{deleteE1=[{id=331, name=null}]}", r.getData().toString());
+    }
+
+    @Test
+    public void includeArgumentTest() {
+        QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
+
+        queryType.configureArguments(EntityBuilder.ConfigureType.INCLUDE_OBJECT, "E1", "id");
+
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
+                .queryType(queryType.build())
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { E1 (id:1) { id name}}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{E1=[{id=1, name=a}]}", r.getData().toString());
+
+        r = graphQL.execute("query { E1 (name:\"a\") { id name}}");
+
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type UnknownArgument: Unknown argument name", r.getErrors().get(0).getMessage());
+    }
+
+    @Test
+    public void excludeArgumentTest() {
+        QueryType.Builder queryType = QueryType.builder(testFactory.getObjectContext());
+
+        queryType.configureArguments(EntityBuilder.ConfigureType.EXCLUDE_OBJECT, "E1", "name");
+
+        GraphQLSchema schema = SchemaBuilder.builder(testFactory.getObjectContext())
+                .queryType(queryType.build())
+                .build();
+
+        GraphQL graphQL = new GraphQL(schema);
+
+        ExecutionResult r = graphQL.execute("query { E1 (id:1) { id name}}");
+        LOGGER.info(r.getData().toString());
+        assertEquals("{E1=[{id=1, name=a}]}", r.getData().toString());
+
+        r = graphQL.execute("query { E1 (name:\"a\") { id name}}");
+
+        assertEquals(ValidationError, r.getErrors().get(0).getErrorType());
+        assertEquals("Validation error of type UnknownArgument: Unknown argument name", r.getErrors().get(0).getMessage());
     }
 }
